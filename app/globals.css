@@ -1,26 +1,74 @@
+/* app/globals.css — Tailwind v4 */
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-ink:      #16293D;  /* all headings and body type */
+  --color-slate:    #6B7D8F;  /* meta, spec labels, counts */
+  --color-line:     #DCE9F2;  /* hairlines, card edges, dividers */
+  --color-white:    #FFFFFF;  /* cards, search bar, top bar */
+  --color-sky:      #E8F4FD;  /* page field behind the cards */
+  --color-azure:    #1479E0;  /* buttons, active tab, links, arrows */
+  --color-azure-ink:#0F5CAD;  /* hover / pressed */
+  --color-whatsapp: #25D366;  /* WhatsApp button only — never reuse */
+  --color-scrim:    #16293Dcc;/* hero gradient stop */
+
+  --font-sans: var(--font-sans);
+
+  --radius-card: 4px;
+  --radius-field: 2px;
+  --shadow-card: 0 1px 2px rgb(22 41 61 / 0.06);
+  --shadow-bar:  0 8px 24px rgb(22 41 61 / 0.12);   /* the overlapping search bar only */
+
+  /* Type Scale */
+  --step--1: clamp(0.78rem, 0.76rem + 0.1vw,  0.85rem);  /* counts, spec labels */
+  --step-0:  clamp(0.95rem, 0.92rem + 0.15vw, 1rem);     /* body, nav */
+  --step-1:  clamp(1.1rem,  1rem + 0.4vw,     1.35rem);  /* card title */
+  --step-2:  clamp(1.75rem, 1.4rem + 1.8vw,   2.75rem);  /* section headings */
+  --step-3:  clamp(2.25rem, 1.7rem + 2.6vw,   3.5rem);   /* detail price */
+  --step-4:  clamp(2.5rem,  1.9rem + 4vw,     4.5rem);   /* hero display, uppercase, 700 */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    overscroll-behavior-y: contain;
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+    background-color: var(--color-white);
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  a, button, [role="button"], select, input[type="checkbox"], input[type="radio"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-sans);
+    color: var(--color-ink);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  .section {
+    padding-top: 56px;
+    padding-bottom: 56px;
+  }
+  @media (min-width: 1024px) {
+    .section {
+      padding-top: 96px;
+      padding-bottom: 96px;
+    }
+  }
+
+  .text-step--1 { font-size: var(--step--1); }
+  .text-step-0  { font-size: var(--step-0); }
+  .text-step-1  { font-size: var(--step-1); }
+  .text-step-2  { font-size: var(--step-2); }
+  .text-step-3  { font-size: var(--step-3); }
+  .text-step-4  { font-size: var(--step-4); line-height: 0.95; letter-spacing: 0.01em; }
 }

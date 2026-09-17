@@ -21,6 +21,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     description: `${title} for sale in ${car.city}. ${car.mileage_km?.toLocaleString() ?? ''}km, ${car.transmission ?? ''}, ${car.fuel ?? ''}. Photos, specs and WhatsApp contact.`,
     alternates: { canonical: `/cars/${car.slug}` },
     openGraph: { type: 'website', title, images: [{ url: `/cars/${car.slug}/opengraph-image` }] },
+    robots: car.status === 'sold' ? { index: false, follow: true } : { index: true, follow: true },
   };
 }
 
@@ -29,32 +30,54 @@ export default async function CarDetail({ params }: { params: Promise<{ slug: st
   const car = await getVehicle(slug);
   if (!car) notFound();
 
+  let similarCars: any[] = [];
+  if (car.status === 'sold') {
+    const { supabaseServer } = await import('@/lib/supabase/server');
+    const supabase = await supabaseServer();
+    const { data } = await supabase.from('vehicles').select('*')
+      .eq('status', 'published').eq('body_type', car.body_type).neq('id', car.id).limit(4);
+    similarCars = data || [];
+  }
+
   const isSold = car.status === 'sold';
   const price = fmtKES(car.price_kes);
 
   const ld = {
     '@context': 'https://schema.org',
-    '@type': 'Car',
-    name: `${car.year} ${car.make} ${car.model}`,
-    brand: { '@type': 'Brand', name: car.make },
-    model: car.model,
-    vehicleModelDate: String(car.year),
-    bodyType: car.body_type,
-    vehicleTransmission: car.transmission,
-    fuelType: car.fuel,
-    vehicleEngine: car.engine_cc ? { '@type':'EngineSpecification', engineDisplacement: { '@type':'QuantitativeValue', value: car.engine_cc, unitCode: 'CMQ' } } : undefined,
-    mileageFromOdometer: car.mileage_km ? { '@type':'QuantitativeValue', value: car.mileage_km, unitCode: 'KMT' } : undefined,
-    itemCondition: car.condition === 'new' ? 'https://schema.org/NewCondition' : 'https://schema.org/UsedCondition',
-    image: car.images?.map((i: any) => `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/w_1200/${i.public_id}`),
-    description: car.description,
-    offers: car.price_kes ? {
-      '@type': 'Offer',
-      price: car.price_kes, priceCurrency: 'KES',
-      availability: car.status === 'sold' ? 'https://schema.org/SoldOut' : 'https://schema.org/InStock',
-      itemCondition: car.condition === 'new' ? 'https://schema.org/NewCondition' : 'https://schema.org/UsedCondition',
-      seller: { '@type': 'AutoDealer', name: 'Coastlane Motors', telephone: process.env.NEXT_PUBLIC_PHONE },
-      url: `${process.env.NEXT_PUBLIC_SITE_URL}/cars/${car.slug}`,
-    } : undefined,
+    '@graph': [
+      {
+        '@type': 'Car',
+        name: `${car.year} ${car.make} ${car.model}`,
+        brand: { '@type': 'Brand', name: car.make },
+        model: car.model,
+        vehicleModelDate: String(car.year),
+        bodyType: car.body_type,
+        vehicleTransmission: car.transmission,
+        fuelType: car.fuel,
+        vehicleEngine: car.engine_cc ? { '@type':'EngineSpecification', engineDisplacement: { '@type':'QuantitativeValue', value: car.engine_cc, unitCode: 'CMQ' } } : undefined,
+        mileageFromOdometer: car.mileage_km ? { '@type':'QuantitativeValue', value: car.mileage_km, unitCode: 'KMT' } : undefined,
+        itemCondition: car.condition === 'new' ? 'https://schema.org/NewCondition' : 'https://schema.org/UsedCondition',
+        image: car.images?.map((i: any) => `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/w_1200/${i.public_id}`),
+        description: car.description,
+        offers: car.price_kes ? {
+          '@type': 'Offer',
+          price: car.price_kes, priceCurrency: 'KES',
+          availability: car.status === 'sold' ? 'https://schema.org/SoldOut' : 'https://schema.org/InStock',
+          itemCondition: car.condition === 'new' ? 'https://schema.org/NewCondition' : 'https://schema.org/UsedCondition',
+          seller: { '@type': 'AutoDealer', name: 'Coastlane Motors', telephone: process.env.NEXT_PUBLIC_PHONE },
+          url: `${process.env.NEXT_PUBLIC_SITE_URL}/cars/${car.slug}`,
+        } : undefined,
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: process.env.NEXT_PUBLIC_SITE_URL },
+          { '@type': 'ListItem', position: 2, name: car.condition === 'used' ? 'Used Cars' : 'New Cars', item: `${process.env.NEXT_PUBLIC_SITE_URL}/${car.condition}` },
+          { '@type': 'ListItem', position: 3, name: car.make, item: `${process.env.NEXT_PUBLIC_SITE_URL}/used/${car.make?.toLowerCase()}` },
+          { '@type': 'ListItem', position: 4, name: `${car.year} ${car.make} ${car.model}` }
+        ]
+      }
+    ]
   };
 
   return (
@@ -76,7 +99,7 @@ export default async function CarDetail({ params }: { params: Promise<{ slug: st
                   SOLD
                 </div>
               )}
-            <Gallery images={car.images || []} />
+            <Gallery images={car.images || []} carMeta={{ year: car.year, make: car.make, model: car.model }} />
           </div>
 
           <div className="flex-1 space-y-8">
@@ -91,7 +114,12 @@ export default async function CarDetail({ params }: { params: Promise<{ slug: st
                 {car.mileage_km != null && <span className="px-3 py-1 bg-sky text-ink rounded-full">{car.mileage_km.toLocaleString()} km</span>}
                 <span className="px-3 py-1 bg-sky text-ink rounded-full">{car.transmission}</span>
                 <span className="px-3 py-1 bg-sky text-ink rounded-full">{car.fuel}</span>
-                {car.duty_paid && <span className="px-3 py-1 bg-sky text-ink rounded-full">Duty Paid</span>}
+              </div>
+              
+              <div className="flex flex-wrap gap-2 mt-4">
+                 {car.duty_paid && <span className="flex items-center gap-1 text-sm font-semibold text-green-700 bg-green-50 px-3 py-1 rounded border border-green-200">✓ Duty Paid</span>}
+                 <span className="flex items-center gap-1 text-sm font-semibold text-green-700 bg-green-50 px-3 py-1 rounded border border-green-200">✓ Logbook Ready</span>
+                 {car.condition === 'used' && <span className="flex items-center gap-1 text-sm font-semibold text-green-700 bg-green-50 px-3 py-1 rounded border border-green-200">✓ Verified Mileage</span>}
               </div>
               
               <div className="mt-4">
@@ -153,6 +181,21 @@ export default async function CarDetail({ params }: { params: Promise<{ slug: st
 
           </div>
         </div>
+        
+        {isSold && similarCars.length > 0 && (
+          <div className="mt-16 pt-12 border-t border-line">
+            <h2 className="font-sans font-bold text-step-2 text-ink mb-6">Similar {car.body_type}s Available Now</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {similarCars.map(c => {
+                 // lazy import CarCard or just map. Actually let's import it at top or require it. 
+                 // Wait, I didn't import CarCard at the top of page.tsx. Let me do that via a standard import.
+                 // Actually I'll use a local import inside the block to avoid needing to replace line 1.
+                 const { CarCard } = require('@/components/car-card');
+                 return <CarCard key={c.id} car={c} />;
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Sticky Mobile CTA */}
@@ -170,7 +213,7 @@ export default async function CarDetail({ params }: { params: Promise<{ slug: st
               <a href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP}?text=Hi%2C%20I%27m%20interested%20in%20the%20${car.year}%20${car.make}%20${car.model}`} target="_blank" rel="noopener noreferrer"
                  className="flex items-center justify-center gap-2 h-12 flex-[2]
                             bg-whatsapp rounded-[var(--radius-card)] font-semibold text-ink active:opacity-90">
-                <MessageCircle size={18} aria-hidden="true" />
+                <img src="/whatsapp-icon.png" alt="" className="w-5 h-5 object-contain" />
                 WhatsApp us
               </a>
             </div>

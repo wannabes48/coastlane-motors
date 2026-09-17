@@ -4,7 +4,7 @@ import { CldImage } from 'next-cloudinary';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import clsx from 'clsx';
 
-export function Gallery({ images }: { images: any[] }) {
+export function Gallery({ images, carMeta }: { images: any[], carMeta?: { year: number, make: string, model: string } }) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   if (!images || images.length === 0) {
@@ -19,11 +19,12 @@ export function Gallery({ images }: { images: any[] }) {
       <div className="relative aspect-[4/3] rounded-[var(--radius-card)] overflow-hidden bg-sky">
         <CldImage
           src={images[currentIndex].public_id}
-          alt={images[currentIndex].alt || `Vehicle image ${currentIndex + 1}`}
+          alt={carMeta ? `${carMeta.year} ${carMeta.make} ${carMeta.model} interior dashboard view - Coastlane Motors` : (images[currentIndex].alt || `Vehicle image ${currentIndex + 1}`)}
           fill
-          sizes="(max-width: 1024px) 100vw, 50vw"
+          sizes="(max-width: 1024px) 100vw, 60vw"
           className="object-cover"
-          priority
+          priority={currentIndex === 0}
+          fetchPriority={currentIndex === 0 ? "high" : "auto"}
         />
         
         {images.length > 1 && (

@@ -20,11 +20,14 @@ export function CarCard({ car }: { car: any }) {
           <CldImage
             src={car.images[0].public_id}
             alt={car.images[0].alt || `${car.year} ${car.make} ${car.model}`}
-            fill
+            width={400}
+            height={300}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className={clsx("object-cover transition-transform group-hover:scale-105 duration-500", isSold && "grayscale opacity-80")}
+            className={clsx("w-full h-full object-cover transition-transform group-hover:scale-105 duration-500", isSold && "grayscale opacity-80")}
             crop="fill"
             gravity="auto"
+            format="auto"
+            quality="auto"
           />
         ) : (
            <div className="absolute inset-0 flex items-center justify-center text-slate">No Image</div>

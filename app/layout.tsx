@@ -4,6 +4,7 @@ import './globals.css';
 import Link from 'next/link';
 import { Logo } from '@/components/logo';
 import { Nav } from '@/components/nav';
+import { CookieBanner } from '@/components/cookie-banner';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -30,22 +31,55 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'AutoDealer',
-    name: 'Coastlane Motors',
-    url: process.env.NEXT_PUBLIC_SITE_URL,
-    telephone: process.env.NEXT_PUBLIC_PHONE,
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: 'Haile Sellassie Avenue',
-      addressLocality: 'Mombasa',
-      addressCountry: 'KE'
-    },
-    openingHoursSpecification: [
+    '@graph': [
       {
-        '@type': 'OpeningHoursSpecification',
-        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-        opens: '08:00',
-        closes: '18:00'
+        '@type': 'AutoDealer',
+        '@id': `${process.env.NEXT_PUBLIC_SITE_URL}/#dealer`,
+        name: 'Coastlane Motors',
+        url: process.env.NEXT_PUBLIC_SITE_URL,
+        telephone: process.env.NEXT_PUBLIC_PHONE,
+        image: `${process.env.NEXT_PUBLIC_SITE_URL}/icon.svg`,
+        address: {
+          '@type': 'PostalAddress',
+          streetAddress: 'Haile Sellassie Avenue',
+          addressLocality: 'Mombasa',
+          addressCountry: 'KE'
+        },
+        geo: {
+          '@type': 'GeoCoordinates',
+          latitude: -4.0628,
+          longitude: 39.6706
+        },
+        openingHoursSpecification: [
+          {
+            '@type': 'OpeningHoursSpecification',
+            dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+            opens: '08:00',
+            closes: '18:00'
+          }
+        ],
+        sameAs: [
+          'https://facebook.com/coastlanemotors',
+          'https://instagram.com/coastlanemotors'
+        ]
+      },
+      {
+        '@type': 'LocalBusiness',
+        '@id': `${process.env.NEXT_PUBLIC_SITE_URL}/#business`,
+        name: 'Coastlane Motors',
+        url: process.env.NEXT_PUBLIC_SITE_URL,
+        telephone: process.env.NEXT_PUBLIC_PHONE,
+        address: {
+          '@type': 'PostalAddress',
+          streetAddress: 'Haile Sellassie Avenue',
+          addressLocality: 'Mombasa',
+          addressCountry: 'KE'
+        },
+        geo: {
+          '@type': 'GeoCoordinates',
+          latitude: -4.0628,
+          longitude: 39.6706
+        },
       }
     ]
   };
@@ -86,7 +120,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <Link href="/new" className="hover:text-white w-fit">New Cars</Link>
                 <Link href="/about" className="hover:text-white w-fit">About Us</Link>
                 <Link href="/contact" className="hover:text-white w-fit">Contact</Link>
-                <Link href="/admin" className="hover:text-white w-fit text-sm mt-4 opacity-50">Staff Login</Link>
               </nav>
             </div>
           </div>
@@ -94,6 +127,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <p>&copy; {new Date().getFullYear()} Coastlane Motors. All rights reserved.</p>
           </div>
         </footer>
+        <CookieBanner />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       </body>
     </html>

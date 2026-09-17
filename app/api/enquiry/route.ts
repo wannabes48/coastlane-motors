@@ -3,7 +3,6 @@ import { supabaseAdmin } from '@/lib/supabase/admin';
 import { z } from 'zod';
 import { NextResponse } from 'next/server';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
 const body = z.object({
   name: z.string().min(2), phone: z.string().min(9),
   email: z.string().email().optional(),
@@ -22,6 +21,7 @@ export async function POST(req: Request) {
   await supabaseAdmin.from('enquiries').insert(data);
 
   if (process.env.RESEND_API_KEY) {
+    const resend = new Resend(process.env.RESEND_API_KEY);
     await resend.emails.send({
       from: 'Coastlane Motors <website@coastlanemotors.co.ke>',
       to: process.env.SALES_INBOX!,

@@ -12,18 +12,41 @@ export async function Listings({ searchParams, condition }: { searchParams: Prom
     city: params.city,
     body: params.body,
     transmission: params.transmission,
+    min: params.min,
+    max: params.max,
     sort: params.sort as Filters['sort'],
     page: params.page ? parseInt(params.page) : 1
   };
 
   const { vehicles, total, pages } = await listVehicles(f);
 
+  const ld = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    itemListElement: vehicles.map((car, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      item: {
+        '@type': 'Car',
+        url: `${process.env.NEXT_PUBLIC_SITE_URL}/cars/${car.slug}`,
+        name: `${car.year} ${car.make} ${car.model}`,
+        image: car.images?.[0] ? `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/w_1200/${car.images[0].public_id}` : undefined,
+        offers: car.price_kes ? {
+          '@type': 'Offer',
+          price: car.price_kes,
+          priceCurrency: 'KES'
+        } : undefined
+      }
+    }))
+  };
+
   return (
     <div className="bg-sky min-h-[calc(100vh-72px)] py-12 lg:py-16">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
       <div className="max-w-7xl mx-auto px-4">
         <div className="mb-8">
           <h1 className="font-sans font-bold text-step-2 text-ink uppercase tracking-tight">
-            {condition === 'used' ? 'Used Cars for Sale' : 'New Cars for Sale'}
+            {params.heading || (condition === 'used' ? 'Used Cars for Sale' : 'New Cars for Sale')}
           </h1>
           <p className="text-slate mt-2">{total} cars available</p>
         </div>

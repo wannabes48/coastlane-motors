@@ -1,8 +1,8 @@
 'use client';
 import { useFormContext, useFieldArray } from 'react-hook-form';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { CldImage } from 'next-cloudinary';
-import { Camera } from 'lucide-react';
+import { Camera, Image as ImageIcon } from 'lucide-react';
 
 export function ImageUploader() {
   const { control } = useFormContext();
@@ -12,6 +12,8 @@ export function ImageUploader() {
   });
   
   const [uploading, setUploading] = useState(false);
+  const cameraRef = useRef<HTMLInputElement>(null);
+  const galleryRef = useRef<HTMLInputElement>(null);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files?.length) return;
@@ -76,16 +78,54 @@ export function ImageUploader() {
         )}
       </div>
       
-      <div>
-        <label className={`flex flex-col items-center justify-center gap-3
-                          h-36 border-2 border-dashed border-line
-                          rounded-[var(--radius-card)] cursor-pointer active:bg-sky
-                          text-slate text-sm font-medium transition-colors ${uploading ? 'opacity-50 pointer-events-none' : ''}`}>
-          <input type="file" accept="image/*" multiple capture="environment"
-                 className="sr-only" onChange={handleUpload} disabled={uploading} />
-          <Camera size={28} className="text-azure" aria-hidden="true" />
-          {uploading ? 'Uploading...' : 'Tap to photograph or choose from gallery'}
-        </label>
+      <div className={`flex flex-col sm:flex-row gap-3 ${uploading ? 'opacity-50 pointer-events-none' : ''}`}>
+        <input
+          ref={cameraRef}
+          type="file"
+          accept="image/*"
+          multiple
+          capture="environment"
+          className="sr-only"
+          aria-hidden="true"
+          tabIndex={-1}
+          onChange={handleUpload}
+          disabled={uploading}
+        />
+        <input
+          ref={galleryRef}
+          type="file"
+          accept="image/*"
+          multiple
+          className="sr-only"
+          aria-hidden="true"
+          tabIndex={-1}
+          onChange={handleUpload}
+          disabled={uploading}
+        />
+        
+        <button
+          type="button"
+          onClick={() => cameraRef.current?.click()}
+          className="flex flex-1 items-center justify-center gap-2
+                     h-16 border-2 border-dashed border-line
+                     rounded-[var(--radius-card)] text-sm font-semibold text-slate
+                     active:bg-sky transition-colors"
+        >
+          <Camera size={24} className="text-azure" aria-hidden="true" />
+          {uploading ? 'Uploading...' : 'Take photo'}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => galleryRef.current?.click()}
+          className="flex flex-1 items-center justify-center gap-2
+                     h-16 border-2 border-dashed border-line
+                     rounded-[var(--radius-card)] text-sm font-semibold text-slate
+                     active:bg-sky transition-colors"
+        >
+          <ImageIcon size={24} className="text-azure" aria-hidden="true" />
+          {uploading ? 'Uploading...' : 'Gallery'}
+        </button>
       </div>
     </div>
   );

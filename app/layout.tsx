@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Poppins } from 'next/font/google';
+import Script from 'next/script';
 import './globals.css';
 import Link from 'next/link';
 import { Logo } from '@/components/logo';
@@ -86,6 +87,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <html lang="en" className={`${poppins.variable} scroll-smooth`}>
+      <head>
+        <Script strategy="afterInteractive" src="https://www.googletagmanager.com/gtag/js?id=G-BJ56VFTZQ0" />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-BJ56VFTZQ0');
+          `}
+        </Script>
+      </head>
       <body className="antialiased min-h-screen flex flex-col">
         <Nav />
         

@@ -7,9 +7,9 @@ import { Phone, MessageCircle } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ViewCounter } from './view-counter';
-import { ViewCount } from '@/components/view-count';
+import { LiveViewCount } from '@/components/live-view-count';
 
-export const revalidate = 0;
+export const revalidate = 60;
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -123,7 +123,7 @@ export default async function CarDetail({ params }: { params: Promise<{ slug: st
               </div>
               
               <div className="mt-4">
-                <ViewCount count={car.views} />
+                <LiveViewCount slug={car.slug} initial={car.views || 0} />
               </div>
             </div>
 

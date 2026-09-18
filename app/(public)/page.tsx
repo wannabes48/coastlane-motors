@@ -1,84 +1,100 @@
-import { HeroSearch } from '@/components/hero-search';
-import { BrandRow } from '@/components/brand-row';
-import { CategoryRail } from '@/components/category-rail';
-import { CarCard } from '@/components/car-card';
-import { listVehicles, getCategoryCounts } from '@/lib/queries';
-import Link from 'next/link';
+// app/(public)/page.tsx  —  Home page
+// All section components are React Server Components.
+// No 'use client' here — data fetching happens inside each section.
 
-export default async function Home() {
-  const { vehicles } = await listVehicles({ page: 1, sort: 'newest' });
-  const featured = vehicles.slice(0, 4);
+import { Suspense } from 'react';
+import type { Metadata } from 'next';
 
+import { HeroSearch }    from '@/components/hero-search';
+import { TrustBar }      from '@/components/home/trust-bar';
+import { BrandRow }      from '@/components/brand-row';
+import { CategoryRail }  from '@/components/category-rail';
+import { StatsBand }     from '@/components/home/stats-band';
+import { InStock }       from '@/components/home/in-stock';
+import { BudgetFinder }  from '@/components/home/budget-finder';
+import { StaffPick }     from '@/components/home/staff-pick';
+import { WhyUs }         from '@/components/home/why-us';
+import { HowItWorks }    from '@/components/home/how-it-works';
+import { RecentlySold }  from '@/components/home/recently-sold';
+import { Testimonials }  from '@/components/home/testimonials';
+import { CTABand }       from '@/components/home/cta-band';
+import { getCategoryCounts } from '@/lib/queries';
+
+export const revalidate = 300; // revalidate every 5 minutes
+
+export const metadata: Metadata = {
+  title: 'Coastlane Motors — Used & New Cars for Sale in Kenya',
+  description:
+    'Browse verified used and new cars for sale in Kenya. Clear prices, full photos, duty paid. WhatsApp us to view or reserve.',
+  alternates: { canonical: '/' },
+};
+
+// Skeleton used for Suspense fallbacks
+function SectionSkeleton({ height = 200 }: { height?: number }) {
+  return (
+    <div
+      className="w-full animate-pulse bg-[#E8F4FD]"
+      style={{ height }}
+      aria-hidden="true"
+    />
+  );
+}
+
+export default async function HomePage() {
   const counts = await getCategoryCounts();
 
   return (
-    <>
+    <main>
+      {/* ① Hero + search — above the fold */}
       <HeroSearch />
-      <BrandRow />
-      
-      <div id="browse">
+
+      {/* ② Trust bar — answers first objections immediately */}
+      <TrustBar />
+
+      {/* ③ Brand row + category rail — browse entry points */}
+      <Suspense fallback={<SectionSkeleton height={80} />}>
+        <BrandRow />
+      </Suspense>
+      <Suspense fallback={<SectionSkeleton height={180} />}>
         <CategoryRail counts={counts} />
-      </div>
+      </Suspense>
 
-      <section className="section bg-white">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-step-2 font-sans font-semibold text-ink">In stock now</h2>
-            <div className="flex items-center gap-4">
-              <div className="hidden sm:flex bg-sky rounded-[var(--radius-card)] p-1">
-                <Link href="/used" className="px-4 py-1 text-sm font-semibold rounded hover:bg-white text-ink transition-colors">Used</Link>
-                <Link href="/new" className="px-4 py-1 text-sm font-semibold rounded hover:bg-white text-ink transition-colors">New</Link>
-              </div>
-              <Link href="/used" className="text-azure font-semibold hover:text-azure-ink transition-colors group flex items-center">
-                See all <span className="ml-1 group-hover:translate-x-1 transition-transform">→</span>
-              </Link>
-            </div>
-          </div>
+      {/* ④ Stats band — social proof anchor */}
+      <Suspense fallback={<SectionSkeleton height={120} />}>
+        <StatsBand />
+      </Suspense>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {featured.length > 0 ? (
-              featured.map(car => <CarCard key={car.id} car={car} />)
-            ) : (
-              <p className="text-slate col-span-full py-12 text-center bg-sky rounded-[var(--radius-card)]">No vehicles in stock yet.</p>
-            )}
-          </div>
-        </div>
-      </section>
+      {/* ⑤ In-stock listings (Used + New tabs) */}
+      <Suspense fallback={<SectionSkeleton height={400} />}>
+        <InStock />
+      </Suspense>
 
-      <section className="section bg-sky">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-step-2 font-sans font-semibold text-ink text-center mb-12">Why buy from Coastlane</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white p-8 rounded-[var(--radius-card)] shadow-[var(--shadow-card)]">
-              <h3 className="font-sans font-bold text-lg mb-3">Clear, upfront pricing</h3>
-              <p className="text-slate">Every car is priced in shillings, with duty fully paid. No hidden fees, no "contact for price" games. What you see is what you pay.</p>
-            </div>
-            <div className="bg-white p-8 rounded-[var(--radius-card)] shadow-[var(--shadow-card)]">
-              <h3 className="font-sans font-bold text-lg mb-3">Verified condition</h3>
-              <p className="text-slate">We inspect every vehicle before listing it. We take our own high-resolution photos so you can see exactly what you're buying.</p>
-            </div>
-            <div className="bg-white p-8 rounded-[var(--radius-card)] shadow-[var(--shadow-card)]">
-              <h3 className="font-sans font-bold text-lg mb-3">East Africa delivery</h3>
-              <p className="text-slate">Located in Mombasa, but we serve the entire region. We can arrange safe delivery to Nairobi, Kampala, Dar es Salaam and beyond.</p>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* ⑥ Budget finder — second most common navigation path */}
+      <Suspense fallback={<SectionSkeleton height={260} />}>
+        <BudgetFinder />
+      </Suspense>
 
-      <section className="bg-ink py-16">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-step-2 font-sans font-semibold text-white mb-6">Not sure what fits your budget?</h2>
-          <p className="text-white/80 mb-8 max-w-2xl mx-auto">Tell us what you're looking for and how much you want to spend. We'll send you options that match.</p>
-          <a 
-            href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP}?text=Hi%20Coastlane%2C%20I%20need%20help%20finding%20a%20car%20within%20my%20budget.`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-whatsapp text-ink font-semibold rounded-full px-8 py-4 inline-flex items-center justify-center transition-opacity hover:opacity-90 text-lg"
-          >
-            WhatsApp us
-          </a>
-        </div>
-      </section>
-    </>
+      {/* ⑦ Staff pick — featured single car */}
+      <Suspense fallback={<SectionSkeleton height={300} />}>
+        <StaffPick />
+      </Suspense>
+
+      {/* ⑧ Why us */}
+      <WhyUs />
+
+      {/* ⑨ How it works */}
+      <HowItWorks />
+
+      {/* ⑩ Recently sold — throughput signal */}
+      <Suspense fallback={<SectionSkeleton height={280} />}>
+        <RecentlySold />
+      </Suspense>
+
+      {/* ⑪ Testimonials */}
+      <Testimonials />
+
+      {/* ⑫ CTA band — last chance before footer */}
+      <CTABand />
+    </main>
   );
 }

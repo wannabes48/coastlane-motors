@@ -14,11 +14,14 @@ export function ViewCounter({ slug }: { slug: string }) {
         return; // already counted in the last 24h
       }
     }
-    
-    localStorage.setItem(key, now.toString());
-    
     const sb = createClient();
-    sb.rpc('bump_views', { p_slug: slug });   // fire-and-forget, no await needed
+    sb.rpc('bump_views', { p_slug: slug }).then(({ error }: { error: any }) => {
+      if (error) {
+        console.error('[ViewCounter] bump_views failed:', error.message, error.code);
+        return;
+      }
+      localStorage.setItem(key, now.toString());
+    });
   }, [slug]);
 
   return null;

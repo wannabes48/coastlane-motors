@@ -63,3 +63,81 @@ export async function getCategoryCounts() {
   }
   return counts;
 }
+
+// ─── StaffPick ────────────────────────────────────────────────────────────────
+
+export async function getFeaturedVehicle() {
+  const supabase = await supabaseServer();
+  const { data } = await supabase
+    .from('vehicles')
+    .select('*')
+    .eq('featured', true)
+    .eq('status', 'published')
+    .maybeSingle();
+  return data;
+}
+
+// ─── StatsBand ────────────────────────────────────────────────────────────────
+
+export async function getStats() {
+  const supabase = await supabaseServer();
+
+  const [{ count: total }, { count: sold }] = await Promise.all([
+    supabase
+      .from('vehicles')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'published'),
+    supabase
+      .from('vehicles')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'sold'),
+  ]);
+
+  return {
+    total: total ?? 0,
+    sold: sold ?? 0,
+    years: new Date().getFullYear() - 2016, // update founding year
+  };
+}
+
+// ─── RecentlySold ─────────────────────────────────────────────────────────────
+
+export async function getRecentlySold(limit = 4) {
+  const supabase = await supabaseServer();
+  const { data } = await supabase
+    .from('vehicles')
+    .select('id, slug, make, model, year, price_kes, images, condition')
+    .eq('status', 'sold')
+    .order('sold_at', { ascending: false })
+    .limit(limit);
+  return data ?? [];
+}
+
+// ─── BudgetFinder ─────────────────────────────────────────────────────────────
+
+type Bucket = { min: number | null; max: number | null };
+
+const BUCKETS: Bucket[] = [
+  { min: null,      max: 1_000_000  },
+  { min: 1_000_000, max: 2_500_000  },
+  { min: 2_500_000, max: 5_000_000  },
+  { min: 5_000_000, max: null       },
+];
+
+export async function getBudgetCounts(): Promise<(number | null)[]> {
+  const supabase = await supabaseServer();
+
+  const results = await Promise.all(
+    BUCKETS.map(({ min, max }) => {
+      let q = supabase
+        .from('vehicles')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'published');
+      if (min != null) q = q.gte('price_kes', min);
+      if (max != null) q = q.lt('price_kes', max);
+      return q;
+    }),
+  );
+
+  return results.map(({ count }) => count ?? null);
+}

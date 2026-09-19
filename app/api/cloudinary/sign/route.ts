@@ -8,7 +8,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-export async function POST() {
+export async function POST(req: Request) {
   const supabase = await supabaseServer();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'unauthorised' }, { status: 401 });
@@ -17,8 +17,11 @@ export async function POST() {
     .select('user_id').eq('user_id', user.id).maybeSingle();
   if (!admin) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
 
+  const body = await req.json().catch(() => ({}));
+  const folder = body.folder || 'coastlane/vehicles';
+
   const timestamp = Math.round(Date.now() / 1000);
-  const params = { timestamp, folder: 'coastlane/vehicles', upload_preset: 'coastlane_vehicles' };
+  const params = { timestamp, folder, upload_preset: 'coastlane_vehicles' };
   const signature = cloudinary.utils.api_sign_request(params, process.env.CLOUDINARY_API_SECRET!);
 
   return NextResponse.json({

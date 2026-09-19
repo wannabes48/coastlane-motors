@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const car = await getVehicle(slug);
   if (!car) return {};
-  const title = `${car.year} ${car.make} ${car.model} ${car.trim ?? ''} — ${fmtKES(car.price_kes)}`.trim();
+  const title = `${car.year} ${car.make} ${car.model} — ${fmtKES(car.price_kes)}`.trim();
   return {
     title,
     description: `${title} for sale in ${car.city}. ${car.mileage_km?.toLocaleString() ?? ''}km, ${car.transmission ?? ''}, ${car.fuel ?? ''}. Photos, specs and WhatsApp contact.`,
@@ -105,7 +105,7 @@ export default async function CarDetail({ params }: { params: Promise<{ slug: st
           <div className="flex-1 space-y-8">
             <div>
               <h1 className="font-sans font-bold text-step-2 text-ink leading-tight mb-2">
-                {car.year} {car.make} {car.model} {car.trim}
+                {car.year} {car.make} {car.model}
               </h1>
               <p className="font-sans font-bold text-step-3 text-ink">{price}</p>
               

@@ -10,11 +10,14 @@ export function CarForm({ initialData = null }: { initialData?: any }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   
+  // Stable ID for new vehicles
+  const [vehicleId] = useState(() => initialData?.id || crypto.randomUUID());
+  
   const methods = useForm({
     resolver: zodResolver(vehicleSchema),
     defaultValues: initialData || {
       condition: 'used', status: 'draft',
-      make: '', model: '', year: new Date().getFullYear(), trim: '',
+      make: '', model: '', year: new Date().getFullYear(),
       price_kes: null, negotiable: true, mileage_km: null,
       transmission: 'Automatic', fuel: 'Petrol', engine_cc: null, drive: '2WD',
       body_type: 'SUV', exterior: '', interior: '', seats: 5,
@@ -23,12 +26,13 @@ export function CarForm({ initialData = null }: { initialData?: any }) {
     }
   });
 
-  const { handleSubmit, register, formState: { errors } } = methods;
+  const { handleSubmit, register, formState: { errors }, watch, setValue } = methods;
+  const images = watch('images') || [];
 
   const onSubmit = async (data: any) => {
     setSaving(true);
     setError('');
-    const res = await saveVehicle(initialData?.id || null, data);
+    const res = await saveVehicle(vehicleId, data);
     if (!res?.ok) {
       setError(res?.message || 'Failed to save vehicle');
       setSaving(false);
@@ -42,7 +46,11 @@ export function CarForm({ initialData = null }: { initialData?: any }) {
         
         <div className="bg-white p-6 rounded-[var(--radius-card)] shadow-[var(--shadow-card)]">
           <h2 className="font-sans font-semibold text-lg mb-4">Photos</h2>
-          <ImageUploader />
+          <ImageUploader 
+            vehicleId={vehicleId} 
+            images={images} 
+            onChange={(newImages) => setValue('images', newImages, { shouldValidate: true })} 
+          />
           {errors.images?.message && <p className="text-red-500 text-sm mt-1">{errors.images.message as string}</p>}
         </div>
 
@@ -52,7 +60,6 @@ export function CarForm({ initialData = null }: { initialData?: any }) {
           <div><label className="block text-sm font-semibold mb-1">Make</label><input {...register('make')} className="w-full border border-line rounded-[var(--radius-card)] px-4 h-12 text-base focus:border-azure focus:outline-none" /></div>
           <div><label className="block text-sm font-semibold mb-1">Model</label><input {...register('model')} className="w-full border border-line rounded-[var(--radius-card)] px-4 h-12 text-base focus:border-azure focus:outline-none" /></div>
           <div><label className="block text-sm font-semibold mb-1">Year</label><input type="number" {...register('year')} className="w-full border border-line rounded-[var(--radius-card)] px-4 h-12 text-base focus:border-azure focus:outline-none" /></div>
-          <div><label className="block text-sm font-semibold mb-1">Trim</label><input {...register('trim')} className="w-full border border-line rounded-[var(--radius-card)] px-4 h-12 text-base focus:border-azure focus:outline-none" /></div>
           
           <div>
              <label className="block text-sm font-semibold mb-1">Condition</label>

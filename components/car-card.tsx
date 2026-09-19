@@ -35,7 +35,7 @@ export function CarCard({ car }: { car: any }) {
       </div>
       <div className="p-4 flex flex-col gap-1">
         <h3 className="font-sans font-semibold text-step-1 text-ink group-hover:text-azure transition-colors line-clamp-1 leading-snug">
-          {car.year} {car.make} {car.model} {car.trim}
+          {car.year} {car.make} {car.model}
         </h3>
         <p className="font-sans font-bold text-step-1 text-ink">
           {fmtKES(car.price_kes)}

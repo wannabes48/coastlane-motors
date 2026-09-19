@@ -12,7 +12,7 @@
   --color-whatsapp: #25D366;  /* WhatsApp button only — never reuse */
   --color-scrim:    #16293Dcc;/* hero gradient stop */
 
-  --font-sans: var(--font-sans);
+  --font-sans: 'Poppins', system-ui, -apple-system, sans-serif;
 
   --radius-card: 4px;
   --radius-field: 2px;

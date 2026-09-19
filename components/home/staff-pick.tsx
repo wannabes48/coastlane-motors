@@ -81,7 +81,6 @@ export async function StaffPick() {
               </p>
               <h3 className="font-[Poppins] text-[20px] sm:text-[22px] font-bold text-[#16293D] leading-tight mb-3">
                 {car.year} {car.make} {car.model}
-                {car.trim ? ` ${car.trim}` : ''}
               </h3>
 
               {/* specs row */}

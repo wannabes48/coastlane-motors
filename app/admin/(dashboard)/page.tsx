@@ -5,6 +5,8 @@ import { FeaturedToggle } from '@/components/admin/featured-toggle';
 import { ViewCount } from '@/components/view-count';
 import { Plus, TrendingUp, Eye, Car, Tag } from 'lucide-react';
 
+import { AdminTableRow } from '@/components/admin/admin-table-row';
+
 export const dynamic = 'force-dynamic';
 
 type SortField = 'updated_at' | 'views' | 'price_kes' | 'created_at';
@@ -204,73 +206,7 @@ export default async function AdminDashboard({
             </thead>
             <tbody>
               {vehicles?.map((v) => (
-                <tr
-                  key={v.id}
-                  className="border-b border-[#DCE9F2] last:border-0 hover:bg-[#FBFBF9]"
-                >
-                  {/* car name */}
-                  <td className="py-3 px-4">
-                    <Link
-                      href={`/admin/cars/${v.id}/edit`}
-                      className="font-[Poppins] text-[13px] font-semibold text-[#16293D]
-                                 hover:text-[#1479E0] transition-colors truncate block"
-                    >
-                      {v.year} {v.make} {v.model}
-                    </Link>
-                  </td>
-
-                  {/* price */}
-                  <td className="py-3 px-4 font-[Poppins] text-[13px] text-[#6B7D8F]">
-                    {fmtKES(v.price_kes)}
-                  </td>
-
-                  {/* condition */}
-                  <td className="py-3 px-4">
-                    <span className="font-[Poppins] text-[11px] font-medium text-[#6B7D8F] capitalize">
-                      {v.condition}
-                    </span>
-                  </td>
-
-                  {/* status badge */}
-                  <td className="py-3 px-4">
-                    <span
-                      className={`inline-block px-2 py-0.5 rounded text-[11px]
-                                  font-[Poppins] font-semibold capitalize
-                                  ${STATUS_COLOURS[v.status] ?? ''}`}
-                    >
-                      {v.status}
-                    </span>
-                  </td>
-
-                  {/* views */}
-                  <td className="py-3 px-4">
-                    <ViewCount count={v.views} />
-                  </td>
-
-                  {/* actions */}
-                  <td className="py-3 px-4">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <Link
-                        href={`/admin/cars/${v.id}/edit`}
-                        className="h-8 px-3 border border-[#DCE9F2] rounded
-                                   font-[Poppins] text-[12px] text-[#16293D]
-                                   hover:border-[#1479E0] transition-colors
-                                   flex items-center"
-                      >
-                        Edit
-                      </Link>
-
-                      {/* ★ featured toggle — the staff pick button */}
-                      {v.status === 'published' && (
-                        <FeaturedToggle
-                          vehicleId={v.id}
-                          featured={v.featured}
-                          label={`${v.year} ${v.make} ${v.model}`}
-                        />
-                      )}
-                    </div>
-                  </td>
-                </tr>
+                <AdminTableRow key={v.id} vehicle={v} />
               ))}
 
               {vehicles?.length === 0 && (

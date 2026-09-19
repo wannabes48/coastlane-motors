@@ -1,19 +1,10 @@
 import type { Metadata, Viewport } from 'next';
-import { Poppins } from 'next/font/google';
 import Script from 'next/script';
 import './globals.css';
 import Link from 'next/link';
 import { Logo } from '@/components/logo';
 import { Nav } from '@/components/nav';
 import { CookieBanner } from '@/components/cookie-banner';
-
-const poppins = Poppins({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
-  variable: '--font-sans',
-  display: 'swap',
-});
-
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
   title: { default: 'Coastlane Motors — Used & New Cars for Sale in Kenya', template: '%s | Coastlane Motors' },
@@ -86,8 +77,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   };
 
   return (
-    <html lang="en" className={`${poppins.variable} scroll-smooth`}>
+    <html lang="en" className="scroll-smooth">
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
         <Script strategy="afterInteractive" src="https://www.googletagmanager.com/gtag/js?id=G-BJ56VFTZQ0" />
         <Script id="google-analytics" strategy="afterInteractive">
           {`

@@ -13,7 +13,6 @@ export const vehicleSchema = z.object({
   status: z.enum(['draft', 'published', 'sold']),
   make: z.string().min(1), model: z.string().min(1),
   year: z.coerce.number().int().min(1980).max(new Date().getFullYear() + 2),
-  trim: z.string().optional(),
   price_kes: z.coerce.number().int().positive().nullable(),
   negotiable: z.boolean().default(true),
   mileage_km: z.coerce.number().int().min(0).nullable(),

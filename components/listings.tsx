@@ -1,6 +1,7 @@
 import { listVehicles, Filters } from '@/lib/queries';
 import { CarCard } from '@/components/car-card';
 import { FilterRail } from '@/components/filter-rail';
+import { Pagination } from '@/components/pagination';
 
 export async function Listings({ searchParams, condition }: { searchParams: Promise<any>, condition: 'used' | 'new' }) {
   const params = await searchParams;
@@ -68,11 +69,18 @@ export async function Listings({ searchParams, condition }: { searchParams: Prom
               </div>
             )}
             
-            {pages > 1 && (
-               <div className="mt-12 flex justify-center items-center gap-4">
-                 <p className="text-slate font-semibold">Page {f.page} of {pages}</p>
-               </div>
-            )}
+            <Pagination
+              page={f.page ?? 1}
+              pages={pages}
+              total={total}
+              buildHref={(p: number) => {
+                const sp = new URLSearchParams(params);
+                if (p === 1) sp.delete('page');
+                else         sp.set('page', String(p));
+                const qs = sp.toString();
+                return `/${condition}${qs ? `?${qs}` : ''}`;
+              }}
+            />
           </main>
         </div>
       </div>

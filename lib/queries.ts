@@ -9,7 +9,7 @@ export type Filters = {
   page?: number;
 };
 
-const PAGE = 12;
+const PAGE_SIZE = 12;
 
 export async function listVehicles(f: Filters) {
   const supabase = await supabaseServer();
@@ -34,10 +34,19 @@ export async function listVehicles(f: Filters) {
   else if (f.sort === 'mileage_asc') q = q.order('mileage_km', { ascending: true, nullsFirst: false });
   else q = q.order('created_at', { ascending: false });
 
-  const page = f.page ?? 1;
-  const { data, count, error } = await q.range((page - 1) * PAGE, page * PAGE - 1);
+  const page = Math.max(1, f.page ?? 1);
+  const from = (page - 1) * PAGE_SIZE;
+  const to   = from + PAGE_SIZE - 1;
+
+  const { data, count, error } = await q.range(from, to);
   if (error) throw error;
-  return { vehicles: data ?? [], total: count ?? 0, pages: Math.ceil((count ?? 0) / PAGE) };
+
+  return {
+    vehicles: data ?? [],
+    total:    count ?? 0,
+    page,
+    pages:    Math.ceil((count ?? 0) / PAGE_SIZE),
+  };
 }
 
 export async function getVehicle(slug: string) {

@@ -15,6 +15,7 @@ export function FilterRail({ counts }: { counts?: Record<string, number> }) {
     else params.delete(key);
     params.delete('page'); // Reset to page 1
     router.push(`?${params.toString()}`);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const activeCount = Array.from(searchParams.keys()).filter(k => k !== 'page' && k !== 'sort').length;
@@ -117,7 +118,7 @@ export function FilterRail({ counts }: { counts?: Record<string, number> }) {
               <FilterFields />
             </div>
             <div className="flex gap-3 p-4 border-t border-line shrink-0">
-              <button onClick={() => { router.push('?'); setOpen(false); }}
+              <button onClick={() => { router.push('?'); window.scrollTo({ top: 0, behavior: 'smooth' }); setOpen(false); }}
                       className="flex-1 h-12 border border-line rounded-[var(--radius-card)] font-semibold text-ink hover:bg-sky transition-colors">
                 Clear all
               </button>
@@ -134,7 +135,7 @@ export function FilterRail({ counts }: { counts?: Record<string, number> }) {
       <aside className="hidden md:block w-64 shrink-0 bg-white p-6 rounded-[var(--radius-card)] shadow-[var(--shadow-card)] h-fit sticky top-24">
         <FilterFields />
         <button 
-          onClick={() => router.push('?')}
+          onClick={() => { router.push('?'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
           className="w-full mt-6 text-slate hover:text-ink text-sm py-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-azure rounded-[var(--radius-card)] h-11"
         >
           Clear all filters

@@ -1,6 +1,13 @@
-import { Tag, Camera, MessageCircle, ShieldCheck, FileText, ThumbsUp } from 'lucide-react';
+import { Tag, Camera, ShieldCheck, FileText, ThumbsUp } from 'lucide-react';
 
-const PILLARS = [
+type Pillar = {
+  icon?: React.ElementType;
+  useWhatsApp?: boolean;
+  title: string;
+  body: string;
+};
+
+const PILLARS: Pillar[] = [
   {
     icon: Tag,
     title: 'Clear pricing',
@@ -12,7 +19,7 @@ const PILLARS = [
     body: 'Every photo is taken at our Mombasa yard, not recycled stock imagery from the manufacturer.',
   },
   {
-    icon: MessageCircle,
+    useWhatsApp: true,
     title: 'WhatsApp first',
     body: 'Message us about any listing. We confirm availability and book a viewing within the hour.',
   },
@@ -53,14 +60,18 @@ export function WhyUs() {
 
         {/* grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {PILLARS.map(({ icon: Icon, title, body }) => (
+          {PILLARS.map(({ icon: Icon, useWhatsApp, title, body }) => (
             <div
               key={title}
               className="bg-white border border-[#DCE9F2] rounded-lg p-5
                          hover:border-[#B5D4F4] transition-colors duration-150"
             >
               <div className="w-10 h-10 rounded-lg bg-[#E8F4FD] flex items-center justify-center mb-4">
-                <Icon size={20} aria-hidden="true" className="text-[#1479E0]" />
+                {useWhatsApp ? (
+                  <img src="/whatsapp-icon.png" alt="" className="w-5 h-5 object-contain" />
+                ) : Icon ? (
+                  <Icon size={20} aria-hidden="true" className="text-[#1479E0]" />
+                ) : null}
               </div>
               <p className="font-[Poppins] text-[13px] font-semibold text-[#16293D] mb-1">
                 {title}

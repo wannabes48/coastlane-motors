@@ -1,4 +1,4 @@
-import { MessageCircle, Phone } from 'lucide-react';
+import { Phone } from 'lucide-react';
 import { waLink } from '@/lib/whatsapp';
 
 export function CTABand() {

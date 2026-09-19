@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Logo } from '@/components/logo';
-import { MessageCircle, Menu, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 
 export function Nav() {
   const [open, setOpen] = useState(false);

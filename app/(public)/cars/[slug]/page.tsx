@@ -6,7 +6,7 @@ import { WhatsAppButton } from '@/components/whatsapp-button';
 import { fmtKES } from '@/lib/money';
 import { waLink } from '@/lib/whatsapp';
 import { Metadata } from 'next';
-import { Phone, MessageCircle } from 'lucide-react';
+import { Phone } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ViewCounter } from './view-counter';
@@ -232,7 +232,7 @@ export default async function CarDetail({ params }: { params: Promise<{ slug: st
               <a href={wa} target="_blank" rel="noopener noreferrer"
                  className="flex items-center justify-center gap-2 h-12 flex-[2]
                             bg-whatsapp rounded-[var(--radius-card)] font-semibold text-ink active:opacity-90">
-                <MessageCircle size={18} aria-hidden="true" />
+                <img src="/whatsapp-icon.png" alt="" className="w-5 h-5 object-contain" />
                 WhatsApp us
               </a>
             </div>

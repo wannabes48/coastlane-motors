@@ -11,19 +11,18 @@ export async function StatsBand() {
   ];
 
   return (
-    <section className="bg-[#16293D] py-10 px-4" aria-label="Coastlane Motors at a glance">
+    <section className="bg-sky py-10 px-4" aria-label="Coastlane Motors at a glance">
       <div className="max-w-4xl mx-auto">
-        <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-[#1E3A50]
-                        border border-[#1E3A50] rounded-lg overflow-hidden">
+        <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-line
+                        border border-line-md rounded-[var(--radius-lg)] overflow-hidden">
           {items.map(({ value, label, accent }) => (
-            <div key={label} className="bg-[#16293D] px-6 py-6 text-center">
+            <div key={label} className="bg-white px-5 py-[22px] text-center">
               <p
-                className="font-[Poppins] text-[32px] font-bold leading-none"
-                style={{ color: accent ? '#1479E0' : '#FFFFFF' }}
+                className={`font-sans text-[30px] font-extrabold leading-none ${accent ? 'text-azure' : 'text-ink'}`}
               >
                 {value}
               </p>
-              <p className="font-[Poppins] text-[11px] text-[#7BA8CC] mt-2 leading-tight">
+              <p className="font-sans text-[11px] font-medium text-slate mt-1 leading-tight">
                 {label}
               </p>
             </div>

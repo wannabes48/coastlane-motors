@@ -16,42 +16,37 @@ const TRUST_ITEMS: TrustItem[] = [
 
 export function TrustBar() {
   return (
-    <div className="w-full bg-white border-b border-[#DCE9F2]">
-      <div className="max-w-7xl mx-auto px-4 py-3">
+    <div className="w-full bg-ink-80 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 py-3.5">
         {/* desktop: single row */}
         <ul className="hidden sm:flex items-center justify-center gap-6 flex-wrap">
-          {TRUST_ITEMS.map(({ icon: Icon, useWhatsApp, label, highlight }, i) => (
+          {TRUST_ITEMS.map(({ icon: Icon, useWhatsApp, label }, i) => (
             <li key={i} className="flex items-center gap-2">
               {useWhatsApp ? (
-                <img src="/whatsapp-icon.png" alt="" className="w-[17px] h-[17px] object-contain" />
+                <img src="/whatsapp-icon.png" alt="" className="w-[15px] h-[15px] object-contain" />
               ) : Icon ? (
-                <Icon
-                  size={17}
-                  aria-hidden="true"
-                  className={highlight ? 'text-[#25D366]' : 'text-[#1479E0]'}
-                />
+                <Icon size={15} aria-hidden="true" className="text-azure" />
               ) : null}
-              <span className="font-[Poppins] text-[13px] font-medium text-[#16293D]">
+              <span className="font-sans text-[13px] font-medium text-white/70 whitespace-nowrap">
                 {label}
               </span>
+              {i < TRUST_ITEMS.length - 1 && (
+                <div className="w-[0.5px] h-4 bg-white/10 ml-4" aria-hidden="true" />
+              )}
             </li>
           ))}
         </ul>
 
         {/* mobile: 2×2 grid */}
         <ul className="grid grid-cols-2 gap-x-4 gap-y-2 sm:hidden">
-          {TRUST_ITEMS.map(({ icon: Icon, useWhatsApp, label, highlight }, i) => (
+          {TRUST_ITEMS.map(({ icon: Icon, useWhatsApp, label }, i) => (
             <li key={i} className="flex items-center gap-2">
               {useWhatsApp ? (
-                <img src="/whatsapp-icon.png" alt="" className="w-4 h-4 object-contain" />
+                <img src="/whatsapp-icon.png" alt="" className="w-[15px] h-[15px] object-contain" />
               ) : Icon ? (
-                <Icon
-                  size={16}
-                  aria-hidden="true"
-                  className={highlight ? 'text-[#25D366]' : 'text-[#1479E0]'}
-                />
+                <Icon size={15} aria-hidden="true" className="text-azure" />
               ) : null}
-              <span className="font-[Poppins] text-[12px] font-medium text-[#16293D] leading-tight">
+              <span className="font-sans text-[12px] font-medium text-white/70 leading-tight">
                 {label}
               </span>
             </li>

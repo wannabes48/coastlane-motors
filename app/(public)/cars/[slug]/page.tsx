@@ -6,7 +6,7 @@ import { WhatsAppButton } from '@/components/whatsapp-button';
 import { fmtKES } from '@/lib/money';
 import { waLink } from '@/lib/whatsapp';
 import { Metadata } from 'next';
-import { Phone } from 'lucide-react';
+import { Phone, Eye, Gauge, Settings2, MapPin } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ViewCounter } from './view-counter';
@@ -116,96 +116,124 @@ export default async function CarDetail({ params }: { params: Promise<{ slug: st
           </div>
 
           {/* ── RIGHT: info panel ── */}
-          <div className="flex-1 space-y-8">
-            <div>
-              <h1 className="font-sans font-bold text-step-2 text-ink leading-tight mb-2">
+          <div className="flex-1 lg:w-[320px] max-w-sm shrink-0 flex flex-col gap-3">
+            
+            {/* Top Card: Title, Price, Views */}
+            <div className="bg-sky border border-line rounded-[var(--radius-lg)] p-4">
+              <div className="text-[11px] text-slate uppercase tracking-[1.5px] font-medium mb-1">
+                {car.condition} {car.body_type ? `· ${car.body_type}` : ''}
+              </div>
+              <h1 className="font-sans font-bold text-[18px] text-ink leading-snug mb-2.5">
                 {car.year} {car.make} {car.model}
               </h1>
-              <p className="font-sans font-bold text-step-3 text-ink">{price}</p>
+              <p className="font-sans font-extrabold text-[26px] text-ink">{price}</p>
               {car.negotiable && (
-                <p className="font-sans text-step--1 text-slate mt-1">Price negotiable</p>
+                <p className="font-sans text-[11px] text-slate mt-0.5">Price negotiable</p>
               )}
               
-              <div className="flex flex-wrap gap-2 mt-4 text-step--1 font-medium">
-                <span className="px-3 py-1 bg-sky text-ink rounded-full capitalize">{car.condition}</span>
-                {car.mileage_km != null && <span className="px-3 py-1 bg-sky text-ink rounded-full">{car.mileage_km.toLocaleString()} km</span>}
-                <span className="px-3 py-1 bg-sky text-ink rounded-full">{car.transmission}</span>
-                <span className="px-3 py-1 bg-sky text-ink rounded-full">{car.fuel}</span>
-              </div>
-              
-              <div className="flex flex-wrap gap-2 mt-4">
-                 {car.duty_paid && <span className="flex items-center gap-1 text-sm font-semibold text-green-700 bg-green-50 px-3 py-1 rounded border border-green-200">✓ Duty Paid</span>}
-                 <span className="flex items-center gap-1 text-sm font-semibold text-green-700 bg-green-50 px-3 py-1 rounded border border-green-200">✓ Logbook Ready</span>
-                 {car.condition === 'used' && <span className="flex items-center gap-1 text-sm font-semibold text-green-700 bg-green-50 px-3 py-1 rounded border border-green-200">✓ Verified Mileage</span>}
+              <div className="flex items-center gap-1.5 mt-2">
+                <Eye size={13} className="text-azure" aria-hidden="true" />
+                <div className="text-[11px] text-slate"><LiveViewCount slug={car.slug} initial={car.views || 0} /></div>
               </div>
 
               {isSold && (
-                <div className="mt-4 bg-sky border border-line rounded-[var(--radius-card)]
-                                px-4 py-3 font-sans text-step--1 text-slate">
-                  This car has been sold — see similar options below.
+                <div className="mt-3 bg-white/50 border border-line rounded-[var(--radius)] px-3 py-2 font-sans text-[11px] text-slate">
+                  This car has been sold.
                 </div>
               )}
-              
-              <div className="mt-4">
-                <LiveViewCount slug={car.slug} initial={car.views || 0} />
+            </div>
+
+            {/* CTAs */}
+            {!isSold && (
+              <div className="flex flex-col gap-2 my-1">
+                <a href={wa} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 h-[46px] bg-wa rounded-[var(--radius)] font-sans text-[14px] font-bold text-white transition-opacity hover:opacity-90">
+                  <img src="/whatsapp-icon.png" alt="" className="w-4 h-4 object-contain" />
+                  WhatsApp us about this car
+                </a>
+                <a href={`tel:${phone}`} className="flex items-center justify-center gap-2 h-[42px] bg-white border border-line-md rounded-[var(--radius)] font-sans text-[14px] font-semibold text-ink transition-colors hover:border-ink">
+                  <Phone size={16} className="text-azure" aria-hidden="true" />
+                  Call us
+                </a>
+              </div>
+            )}
+
+            {/* Specs Card */}
+            <div className="bg-sky border border-line rounded-[var(--radius-lg)] p-4">
+              <div className="font-sans text-[12px] font-semibold text-ink mb-3">Specifications</div>
+              <div className="grid grid-cols-2 gap-x-2 gap-y-2.5">
+                {car.mileage_km != null && (
+                  <div>
+                    <div className="flex items-center gap-1 text-[10px] text-slate uppercase tracking-[1.5px] mb-0.5">
+                      <Gauge size={11} className="text-azure" aria-hidden="true" /> Mileage
+                    </div>
+                    <div className="font-sans text-[13px] font-semibold text-ink">{car.mileage_km.toLocaleString()} km</div>
+                  </div>
+                )}
+                {car.transmission && (
+                  <div>
+                    <div className="flex items-center gap-1 text-[10px] text-slate uppercase tracking-[1.5px] mb-0.5">
+                      <Settings2 size={11} className="text-azure" aria-hidden="true" /> Trans.
+                    </div>
+                    <div className="font-sans text-[13px] font-semibold text-ink">{car.transmission}</div>
+                  </div>
+                )}
+                {car.city && (
+                  <div>
+                    <div className="flex items-center gap-1 text-[10px] text-slate uppercase tracking-[1.5px] mb-0.5">
+                      <MapPin size={11} className="text-azure" aria-hidden="true" /> Location
+                    </div>
+                    <div className="font-sans text-[13px] font-semibold text-ink">{car.city}</div>
+                  </div>
+                )}
+                {car.fuel && (
+                  <div>
+                    <div className="flex items-center gap-1 text-[10px] text-slate uppercase tracking-[1.5px] mb-0.5">
+                      <div className="w-2.5 h-2.5 rounded-full border-[2px] border-azure" aria-hidden="true" /> Fuel
+                    </div>
+                    <div className="font-sans text-[13px] font-semibold text-ink">{car.fuel}</div>
+                  </div>
+                )}
+                {car.engine_cc && (
+                  <div>
+                    <div className="flex items-center gap-1 text-[10px] text-slate uppercase tracking-[1.5px] mb-0.5">
+                      <div className="w-2.5 h-2.5 rounded-sm border-[2px] border-azure" aria-hidden="true" /> Engine
+                    </div>
+                    <div className="font-sans text-[13px] font-semibold text-ink">{car.engine_cc} CC</div>
+                  </div>
+                )}
+                {car.exterior && (
+                  <div>
+                    <div className="flex items-center gap-1 text-[10px] text-slate uppercase tracking-[1.5px] mb-0.5">
+                      <div className="w-2.5 h-2.5 rounded border-[2px] border-azure" aria-hidden="true" /> Color
+                    </div>
+                    <div className="font-sans text-[13px] font-semibold text-ink">{car.exterior}</div>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* contact CTA */}
-            <div className="bg-sky p-6 rounded-[var(--radius-card)] flex flex-col gap-4">
-               {isSold ? (
-                 <p className="font-sans font-medium text-ink">This one&apos;s sold — we usually have similar stock arriving.</p>
-               ) : (
-                 <>
-                   <p className="font-sans font-medium text-ink">Interested? We&apos;re ready to help.</p>
-                   <div className="flex flex-col sm:flex-row gap-4">
-                     <WhatsAppButton car={car} className="flex-1" />
-                     <a href={`tel:${phone}`} className="flex-1 bg-white border border-line text-ink font-semibold rounded-full px-6 py-3 inline-flex items-center justify-center transition-colors hover:border-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-azure">
-                       Call {phone}
-                     </a>
-                   </div>
-                 </>
-               )}
-            </div>
-
-            {/* description */}
-            <div>
-              <h2 className="font-sans font-semibold text-step-1 text-ink mb-4">Description</h2>
-              <div className="prose prose-slate max-w-none text-step-0 whitespace-pre-wrap">
-                {car.description}
+            {/* Description (bare) */}
+            {car.description && (
+              <div className="mt-2">
+                <div className="prose prose-slate max-w-none font-sans text-[13px] whitespace-pre-wrap leading-relaxed text-slate">
+                  {car.description}
+                </div>
               </div>
-            </div>
-
-            {/* specifications */}
-            <div className="border-t border-line pt-8">
-              <h2 className="font-sans font-semibold text-step-1 text-ink mb-4">Specifications</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 text-step-0">
-                {car.make && <div className="flex justify-between border-b border-line pb-2"><span className="text-slate">Make</span><span className="font-medium text-ink">{car.make}</span></div>}
-                {car.model && <div className="flex justify-between border-b border-line pb-2"><span className="text-slate">Model</span><span className="font-medium text-ink">{car.model}</span></div>}
-                {car.year && <div className="flex justify-between border-b border-line pb-2"><span className="text-slate">Year</span><span className="font-medium text-ink">{car.year}</span></div>}
-                {car.body_type && <div className="flex justify-between border-b border-line pb-2"><span className="text-slate">Body Type</span><span className="font-medium text-ink">{car.body_type}</span></div>}
-                {car.engine_cc && <div className="flex justify-between border-b border-line pb-2"><span className="text-slate">Engine</span><span className="font-medium text-ink">{car.engine_cc} CC</span></div>}
-                {car.drive && <div className="flex justify-between border-b border-line pb-2"><span className="text-slate">Drive</span><span className="font-medium text-ink">{car.drive}</span></div>}
-                {car.exterior && <div className="flex justify-between border-b border-line pb-2"><span className="text-slate">Exterior Color</span><span className="font-medium text-ink">{car.exterior}</span></div>}
-                {car.interior && <div className="flex justify-between border-b border-line pb-2"><span className="text-slate">Interior Color</span><span className="font-medium text-ink">{car.interior}</span></div>}
-                {car.seats && <div className="flex justify-between border-b border-line pb-2"><span className="text-slate">Seats</span><span className="font-medium text-ink">{car.seats}</span></div>}
-                {car.city && <div className="flex justify-between border-b border-line pb-2"><span className="text-slate">Location</span><span className="font-medium text-ink">{car.city}</span></div>}
-              </div>
-            </div>
-
-            {/* features */}
+            )}
+            
+            {/* Features (bare) */}
             {car.features && car.features.length > 0 && (
-              <div className="border-t border-line pt-8">
-                <h2 className="font-sans font-semibold text-step-1 text-ink mb-4">Features</h2>
-                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-step-0">
+              <div className="mt-2 border-t border-line pt-4">
+                <ul className="flex flex-col gap-2 font-sans text-[13px] text-ink">
                   {car.features.map((f: string, i: number) => (
-                    <li key={i} className="flex items-center text-ink before:content-['✓'] before:text-azure before:mr-3 before:font-bold">
+                    <li key={i} className="flex items-center before:content-['✓'] before:text-azure before:mr-2 before:font-bold before:text-[14px]">
                       {f}
                     </li>
                   ))}
                 </ul>
               </div>
             )}
+            
           </div>
         </div>
         

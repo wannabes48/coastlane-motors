@@ -26,7 +26,7 @@ export function Nav() {
 
           {/* WhatsApp always visible */}
           <a href={waLink} target="_blank" rel="noopener noreferrer"
-             className="flex items-center justify-center gap-2 h-11 px-4 rounded-full bg-whatsapp text-ink text-sm font-semibold hover:opacity-90 transition-opacity">
+             className="flex items-center justify-center gap-2 h-11 px-4 rounded-full bg-wa text-ink text-sm font-semibold hover:opacity-90 transition-opacity">
             <img src="/whatsapp-icon.png" alt="" className="w-5 h-5 object-contain" />
             <span className="hidden sm:inline">WhatsApp</span>
           </a>

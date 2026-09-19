@@ -27,45 +27,45 @@ type Vehicle = {
 };
 
 const STATUS_COLOURS: Record<string, string> = {
-  published: 'bg-[#E1F5EE] text-[#0F6E56]',
-  draft:     'bg-[#E8F4FD] text-[#1479E0]',
-  sold:      'bg-[#E8E8E8] text-[#5C6B72]',
+  published: 'bg-[#ECFDF5] text-[#065F46]',
+  draft:     'bg-azure-l text-azure',
+  sold:      'bg-[#F1F5F9] text-slate',
 };
 
 export function AdminTableRow({ vehicle: v }: { vehicle: Vehicle }) {
   const label = `${v.year} ${v.make} ${v.model}`;
 
   return (
-    <tr className="border-b border-[#DCE9F2] last:border-0 hover:bg-[#FBFBF9]">
+    <tr className="border-b border-line last:border-0 hover:bg-[#FAFAFA] bg-white group">
 
       {/* car name */}
-      <td className="py-3 px-4">
+      <td className="py-2.5 px-3.5">
         <Link
           href={`/admin/cars/${v.id}/edit`}
-          className="font-[Poppins] text-[13px] font-semibold text-[#16293D]
-                     hover:text-[#1479E0] transition-colors truncate block"
+          className="font-sans text-[12px] font-semibold text-ink
+                     hover:text-azure transition-colors truncate block"
         >
           {label}
         </Link>
       </td>
 
       {/* price */}
-      <td className="py-3 px-4 font-[Poppins] text-[13px] text-[#6B7D8F]">
+      <td className="py-2.5 px-3.5 font-sans text-[12px] text-slate">
         {fmtKES(v.price_kes)}
       </td>
 
       {/* condition */}
-      <td className="py-3 px-4">
-        <span className="font-[Poppins] text-[11px] font-medium text-[#6B7D8F] capitalize">
+      <td className="py-2.5 px-3.5">
+        <span className="font-sans text-[11px] font-medium text-slate capitalize">
           {v.condition}
         </span>
       </td>
 
       {/* status badge */}
-      <td className="py-3 px-4">
+      <td className="py-2.5 px-3.5">
         <span
-          className={`inline-block px-2 py-0.5 rounded text-[11px]
-                      font-[Poppins] font-semibold capitalize
+          className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px]
+                      font-sans font-semibold capitalize
                       ${STATUS_COLOURS[v.status] ?? ''}`}
         >
           {v.status}
@@ -73,19 +73,21 @@ export function AdminTableRow({ vehicle: v }: { vehicle: Vehicle }) {
       </td>
 
       {/* views */}
-      <td className="py-3 px-4">
-        <ViewCount count={v.views} />
+      <td className="py-2.5 px-3.5">
+        <div className="flex items-center gap-1.5 text-slate text-[11px]">
+           <ViewCount count={v.views} />
+        </div>
       </td>
 
       {/* actions */}
-      <td className="py-3 px-4">
-        <div className="flex items-center gap-2 flex-wrap">
+      <td className="py-2.5 px-3.5 border-l border-line">
+        <div className="flex items-center gap-1.5">
           {/* edit */}
           <Link
             href={`/admin/cars/${v.id}/edit`}
-            className="h-9 px-3 border border-[#DCE9F2] rounded
-                       font-[Poppins] text-[12px] font-medium text-[#16293D]
-                       hover:border-[#1479E0] hover:text-[#1479E0]
+            className="h-[28px] px-2.5 border border-line rounded
+                       font-sans text-[11px] font-medium text-ink
+                       hover:border-azure hover:text-azure
                        transition-colors flex items-center"
           >
             Edit

@@ -48,12 +48,12 @@ export function DeleteVehicleButton({ vehicleId, label }: Props) {
         type="button"
         onClick={() => setOpen(true)}
         aria-label={`Delete ${label}`}
-        className="flex items-center justify-center w-9 h-9
-                   border border-[#DCE9F2] rounded text-[#6B7D8F]
+        className="flex items-center justify-center w-[28px] h-[28px]
+                   border border-line rounded text-slate
                    hover:border-red-300 hover:text-red-600
                    transition-colors duration-150"
       >
-        <Trash2 size={15} aria-hidden="true" />
+        <Trash2 size={13} aria-hidden="true" />
       </button>
 
       {/* modal */}

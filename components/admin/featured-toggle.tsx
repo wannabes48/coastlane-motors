@@ -31,17 +31,17 @@ export function FeaturedToggle({ vehicleId, featured, label }: Props) {
           : `Set ${label ?? 'this car'} as staff pick`
       }
       title={featured ? 'Remove staff pick' : 'Set as staff pick'}
-      className={`flex items-center gap-1.5 h-8 px-3 rounded text-[12px] font-[Poppins]
-                  font-semibold border transition-colors duration-150
+      className={`flex items-center gap-1 h-[26px] px-2.5 rounded-full text-[10px] font-sans
+                  font-semibold transition-colors duration-150
                   disabled:opacity-50 disabled:cursor-wait
                   ${
                     featured
-                      ? 'bg-[#1479E0] border-[#1479E0] text-white'
-                      : 'bg-white border-[#DCE9F2] text-[#6B7D8F] hover:border-[#1479E0] hover:text-[#1479E0]'
+                      ? 'bg-azure text-white'
+                      : 'bg-white border border-line text-slate hover:border-azure hover:text-azure'
                   }`}
     >
       <Star
-        size={14}
+        size={11}
         aria-hidden="true"
         className={featured ? 'fill-white' : ''}
       />

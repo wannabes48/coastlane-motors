@@ -2,30 +2,42 @@
 @import "tailwindcss";
 
 @theme {
-  --color-ink:      #16293D;  /* all headings and body type */
-  --color-slate:    #6B7D8F;  /* meta, spec labels, counts */
-  --color-line:     #DCE9F2;  /* hairlines, card edges, dividers */
-  --color-white:    #FFFFFF;  /* cards, search bar, top bar */
-  --color-sky:      #E8F4FD;  /* page field behind the cards */
-  --color-azure:    #1479E0;  /* buttons, active tab, links, arrows */
-  --color-azure-ink:#0F5CAD;  /* hover / pressed */
-  --color-whatsapp: #25D366;  /* WhatsApp button only — never reuse */
-  --color-scrim:    #16293Dcc;/* hero gradient stop */
+  /* ── Colour ── */
+  --color-ink:      #0F1923;
+  --color-ink-80:   #1E2D3D;
+  --color-ink-60:   #3D5168;
+  --color-slate:    #64748B;
+  --color-line:     #E2E8F0;
+  --color-line-md:  #CBD5E1;
+  --color-sky:      #F0F6FF;
+  --color-white:    #FFFFFF;
+  --color-azure:    #1565C0;
+  --color-azure-h:  #0D47A1;
+  --color-azure-l:  #E3EEFF;
+  --color-wa:       #22C55E;
+  --color-gold:     #D4A843;
 
-  --font-sans: 'Poppins', system-ui, -apple-system, sans-serif;
+  /* ── Type ── */
+  --font-sans: "Poppins", ui-sans-serif, system-ui;
 
-  --radius-card: 4px;
-  --radius-field: 2px;
-  --shadow-card: 0 1px 2px rgb(22 41 61 / 0.06);
-  --shadow-bar:  0 8px 24px rgb(22 41 61 / 0.12);   /* the overlapping search bar only */
+  /* ── Radius ── */
+  --radius-sm:   4px;
+  --radius:      6px;
+  --radius-lg:   12px;
+  --radius-pill: 999px;
+
+  /* ── Borders (we'll implement borders via utility classes instead of theme for now) ── */
+
+  --shadow-card: 0 1px 2px rgb(15 25 35 / 0.06);
+  --shadow-bar:  0 8px 24px rgb(15 25 35 / 0.12);
 
   /* Type Scale */
-  --step--1: clamp(0.78rem, 0.76rem + 0.1vw,  0.85rem);  /* counts, spec labels */
-  --step-0:  clamp(0.95rem, 0.92rem + 0.15vw, 1rem);     /* body, nav */
-  --step-1:  clamp(1.1rem,  1rem + 0.4vw,     1.35rem);  /* card title */
-  --step-2:  clamp(1.75rem, 1.4rem + 1.8vw,   2.75rem);  /* section headings */
-  --step-3:  clamp(2.25rem, 1.7rem + 2.6vw,   3.5rem);   /* detail price */
-  --step-4:  clamp(2.5rem,  1.9rem + 4vw,     4.5rem);   /* hero display, uppercase, 700 */
+  --step--1: clamp(0.78rem, 0.76rem + 0.1vw,  0.85rem);
+  --step-0:  clamp(0.95rem, 0.92rem + 0.15vw, 1rem);
+  --step-1:  clamp(1.1rem,  1rem + 0.4vw,     1.35rem);
+  --step-2:  clamp(1.75rem, 1.4rem + 1.8vw,   2.75rem);
+  --step-3:  clamp(2.25rem, 1.7rem + 2.6vw,   3.5rem);
+  --step-4:  clamp(2.5rem,  1.9rem + 4vw,     4.5rem);
 }
 
 @layer base {

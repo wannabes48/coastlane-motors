@@ -1,7 +1,10 @@
-import { getVehicle } from '@/lib/queries';
+import { getVehicle, getAdjacentVehicles, getSimilarVehicles } from '@/lib/queries';
 import { Gallery } from '@/components/gallery';
+import { CarNav } from '@/components/car-nav';
+import { SimilarCars } from '@/components/similar-cars';
 import { WhatsAppButton } from '@/components/whatsapp-button';
 import { fmtKES } from '@/lib/money';
+import { waLink } from '@/lib/whatsapp';
 import { Metadata } from 'next';
 import { Phone, MessageCircle } from 'lucide-react';
 import { notFound } from 'next/navigation';
@@ -30,17 +33,16 @@ export default async function CarDetail({ params }: { params: Promise<{ slug: st
   const car = await getVehicle(slug);
   if (!car) notFound();
 
-  let similarCars: any[] = [];
-  if (car.status === 'sold') {
-    const { supabaseServer } = await import('@/lib/supabase/server');
-    const supabase = await supabaseServer();
-    const { data } = await supabase.from('vehicles').select('*')
-      .eq('status', 'published').eq('body_type', car.body_type).neq('id', car.id).limit(4);
-    similarCars = data || [];
-  }
+  // run all data fetches in parallel — no waterfall
+  const [{ prev, next }, similar] = await Promise.all([
+    getAdjacentVehicles(car.id, car.condition, car.created_at),
+    getSimilarVehicles(car.id, car.body_type, car.price_kes, car.condition),
+  ]);
 
   const isSold = car.status === 'sold';
   const price = fmtKES(car.price_kes);
+  const wa = waLink(car);
+  const phone = process.env.NEXT_PUBLIC_PHONE!;
 
   const ld = {
     '@context': 'https://schema.org',
@@ -64,7 +66,7 @@ export default async function CarDetail({ params }: { params: Promise<{ slug: st
           price: car.price_kes, priceCurrency: 'KES',
           availability: car.status === 'sold' ? 'https://schema.org/SoldOut' : 'https://schema.org/InStock',
           itemCondition: car.condition === 'new' ? 'https://schema.org/NewCondition' : 'https://schema.org/UsedCondition',
-          seller: { '@type': 'AutoDealer', name: 'Coastlane Motors', telephone: process.env.NEXT_PUBLIC_PHONE },
+          seller: { '@type': 'AutoDealer', name: 'Coastlane Motors', telephone: phone },
           url: `${process.env.NEXT_PUBLIC_SITE_URL}/cars/${car.slug}`,
         } : undefined,
       },
@@ -84,6 +86,8 @@ export default async function CarDetail({ params }: { params: Promise<{ slug: st
     <div className="bg-white min-h-[calc(100vh-72px)]">
       <ViewCounter slug={car.slug} />
       <div className="max-w-7xl mx-auto px-4 py-8 lg:py-12">
+
+        {/* breadcrumb */}
         <div className="flex items-center text-sm text-slate mb-6">
           <Link href="/" className="hover:text-ink transition-colors">Home</Link>
           <span className="mx-2">/</span>
@@ -93,6 +97,7 @@ export default async function CarDetail({ params }: { params: Promise<{ slug: st
         </div>
 
         <div className="flex flex-col lg:flex-row gap-12 lg:items-start">
+          {/* ── LEFT: gallery + nav ── */}
           <div className="w-full lg:w-3/5 shrink-0 relative">
              {isSold && (
                 <div className="absolute top-4 right-4 bg-ink text-white px-4 py-2 font-sans font-semibold z-10 rounded-[var(--radius-card)] shadow-lg text-lg">
@@ -105,14 +110,21 @@ export default async function CarDetail({ params }: { params: Promise<{ slug: st
               model={car.model} 
               year={car.year} 
             />
+
+            {/* prev / next navigation */}
+            <CarNav prev={prev} next={next} />
           </div>
 
+          {/* ── RIGHT: info panel ── */}
           <div className="flex-1 space-y-8">
             <div>
               <h1 className="font-sans font-bold text-step-2 text-ink leading-tight mb-2">
                 {car.year} {car.make} {car.model}
               </h1>
               <p className="font-sans font-bold text-step-3 text-ink">{price}</p>
+              {car.negotiable && (
+                <p className="font-sans text-step--1 text-slate mt-1">Price negotiable</p>
+              )}
               
               <div className="flex flex-wrap gap-2 mt-4 text-step--1 font-medium">
                 <span className="px-3 py-1 bg-sky text-ink rounded-full capitalize">{car.condition}</span>
@@ -126,28 +138,37 @@ export default async function CarDetail({ params }: { params: Promise<{ slug: st
                  <span className="flex items-center gap-1 text-sm font-semibold text-green-700 bg-green-50 px-3 py-1 rounded border border-green-200">✓ Logbook Ready</span>
                  {car.condition === 'used' && <span className="flex items-center gap-1 text-sm font-semibold text-green-700 bg-green-50 px-3 py-1 rounded border border-green-200">✓ Verified Mileage</span>}
               </div>
+
+              {isSold && (
+                <div className="mt-4 bg-sky border border-line rounded-[var(--radius-card)]
+                                px-4 py-3 font-sans text-step--1 text-slate">
+                  This car has been sold — see similar options below.
+                </div>
+              )}
               
               <div className="mt-4">
                 <LiveViewCount slug={car.slug} initial={car.views || 0} />
               </div>
             </div>
 
+            {/* contact CTA */}
             <div className="bg-sky p-6 rounded-[var(--radius-card)] flex flex-col gap-4">
                {isSold ? (
-                 <p className="font-sans font-medium text-ink">This one's sold — we usually have similar stock arriving.</p>
+                 <p className="font-sans font-medium text-ink">This one&apos;s sold — we usually have similar stock arriving.</p>
                ) : (
                  <>
-                   <p className="font-sans font-medium text-ink">Interested? We're ready to help.</p>
+                   <p className="font-sans font-medium text-ink">Interested? We&apos;re ready to help.</p>
                    <div className="flex flex-col sm:flex-row gap-4">
                      <WhatsAppButton car={car} className="flex-1" />
-                     <a href={`tel:${process.env.NEXT_PUBLIC_PHONE}`} className="flex-1 bg-white border border-line text-ink font-semibold rounded-full px-6 py-3 inline-flex items-center justify-center transition-colors hover:border-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-azure">
-                       Call {process.env.NEXT_PUBLIC_PHONE}
+                     <a href={`tel:${phone}`} className="flex-1 bg-white border border-line text-ink font-semibold rounded-full px-6 py-3 inline-flex items-center justify-center transition-colors hover:border-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-azure">
+                       Call {phone}
                      </a>
                    </div>
                  </>
                )}
             </div>
 
+            {/* description */}
             <div>
               <h2 className="font-sans font-semibold text-step-1 text-ink mb-4">Description</h2>
               <div className="prose prose-slate max-w-none text-step-0 whitespace-pre-wrap">
@@ -155,6 +176,7 @@ export default async function CarDetail({ params }: { params: Promise<{ slug: st
               </div>
             </div>
 
+            {/* specifications */}
             <div className="border-t border-line pt-8">
               <h2 className="font-sans font-semibold text-step-1 text-ink mb-4">Specifications</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 text-step-0">
@@ -171,6 +193,7 @@ export default async function CarDetail({ params }: { params: Promise<{ slug: st
               </div>
             </div>
 
+            {/* features */}
             {car.features && car.features.length > 0 && (
               <div className="border-t border-line pt-8">
                 <h2 className="font-sans font-semibold text-step-1 text-ink mb-4">Features</h2>
@@ -183,24 +206,15 @@ export default async function CarDetail({ params }: { params: Promise<{ slug: st
                 </ul>
               </div>
             )}
-
           </div>
         </div>
         
-        {isSold && similarCars.length > 0 && (
-          <div className="mt-16 pt-12 border-t border-line">
-            <h2 className="font-sans font-bold text-step-2 text-ink mb-6">Similar {car.body_type}s Available Now</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {similarCars.map(c => {
-                 // lazy import CarCard or just map. Actually let's import it at top or require it. 
-                 // Wait, I didn't import CarCard at the top of page.tsx. Let me do that via a standard import.
-                 // Actually I'll use a local import inside the block to avoid needing to replace line 1.
-                 const { CarCard } = require('@/components/car-card');
-                 return <CarCard key={c.id} car={c} />;
-              })}
-            </div>
-          </div>
-        )}
+        {/* ── similar cars ── */}
+        <SimilarCars
+          cars={similar}
+          currentBodyType={car.body_type}
+          currentPrice={car.price_kes}
+        />
       </div>
 
       {/* Sticky Mobile CTA */}
@@ -209,16 +223,16 @@ export default async function CarDetail({ params }: { params: Promise<{ slug: st
           <div className="fixed bottom-0 inset-x-0 z-40 md:hidden bg-white border-t border-line p-3"
                style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom))' }}>
             <div className="flex gap-3 h-12">
-              <a href={`tel:${process.env.NEXT_PUBLIC_PHONE}`}
+              <a href={`tel:${phone}`}
                  className="flex items-center justify-center gap-2 h-12 flex-1
                             border border-line rounded-[var(--radius-card)] font-semibold text-ink active:bg-sky">
                 <Phone size={18} aria-hidden="true" className="text-azure" />
                 Call
               </a>
-              <a href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP}?text=Hi%2C%20I%27m%20interested%20in%20the%20${car.year}%20${car.make}%20${car.model}`} target="_blank" rel="noopener noreferrer"
+              <a href={wa} target="_blank" rel="noopener noreferrer"
                  className="flex items-center justify-center gap-2 h-12 flex-[2]
                             bg-whatsapp rounded-[var(--radius-card)] font-semibold text-ink active:opacity-90">
-                <img src="/whatsapp-icon.png" alt="" className="w-5 h-5 object-contain" />
+                <MessageCircle size={18} aria-hidden="true" />
                 WhatsApp us
               </a>
             </div>

@@ -150,3 +150,95 @@ export async function getBudgetCounts(): Promise<(number | null)[]> {
 
   return results.map(({ count }) => count ?? null);
 }
+
+// ─── Adjacent cars (prev / next by created_at) ────────────────────────────────
+
+export async function getAdjacentVehicles(
+  currentId: string,
+  condition: 'used' | 'new',
+  createdAt: string,
+) {
+  const supabase = await supabaseServer();
+
+  const cols = 'id, slug, make, model, year, price_kes, images, condition';
+
+  const [{ data: prevData }, { data: nextData }] = await Promise.all([
+    supabase
+      .from('vehicles')
+      .select(cols)
+      .eq('status', 'published')
+      .eq('condition', condition)
+      .neq('id', currentId)
+      .lt('created_at', createdAt)
+      .order('created_at', { ascending: false })
+      .limit(1),
+
+    supabase
+      .from('vehicles')
+      .select(cols)
+      .eq('status', 'published')
+      .eq('condition', condition)
+      .neq('id', currentId)
+      .gt('created_at', createdAt)
+      .order('created_at', { ascending: true })
+      .limit(1),
+  ]);
+
+  return {
+    prev: prevData?.[0] ?? null,
+    next: nextData?.[0] ?? null,
+  };
+}
+
+// ─── Similar cars ─────────────────────────────────────────────────────────────
+
+export async function getSimilarVehicles(
+  currentId: string,
+  bodyType: string | null,
+  priceKes: number | null,
+  condition: 'used' | 'new',
+) {
+  const supabase = await supabaseServer();
+  const LIMIT = 4;
+
+  const cols = 'id, slug, make, model, year, price_kes, images, condition, body_type, mileage_km, transmission, city';
+
+  // ── pass 1: same body type ──
+  let byBody: any[] = [];
+  if (bodyType) {
+    const { data } = await supabase
+      .from('vehicles')
+      .select(cols)
+      .eq('status', 'published')
+      .eq('body_type', bodyType)
+      .neq('id', currentId)
+      .limit(LIMIT);
+    byBody = data ?? [];
+  }
+
+  if (byBody.length >= LIMIT) return byBody.slice(0, LIMIT);
+
+  // ── pass 2: fill with price-range neighbours ──
+  const existingIds = new Set([currentId, ...byBody.map((c) => c.id)]);
+  let byPrice: any[] = [];
+
+  if (priceKes) {
+    const margin = 0.4;
+    const min = Math.round(priceKes * (1 - margin));
+    const max = Math.round(priceKes * (1 + margin));
+
+    const { data } = await supabase
+      .from('vehicles')
+      .select(cols)
+      .eq('status', 'published')
+      .neq('id', currentId)
+      .gte('price_kes', min)
+      .lte('price_kes', max)
+      .order('price_kes', { ascending: true })
+      .limit(LIMIT * 2);
+
+    byPrice = (data ?? []).filter((c) => !existingIds.has(c.id));
+  }
+
+  return [...byBody, ...byPrice].slice(0, LIMIT);
+}

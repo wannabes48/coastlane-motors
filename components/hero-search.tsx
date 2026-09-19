@@ -15,7 +15,7 @@ export function HeroSearch() {
           sizes="100vw"
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-scrim to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-ink/90 via-ink/60 to-ink/20 lg:to-transparent" />
         
         <div className="absolute inset-0 flex flex-col justify-center px-4 lg:px-12 max-w-7xl mx-auto">
           <h1 className="text-step-4 font-extrabold text-white uppercase leading-none tracking-tight max-w-[12ch]">

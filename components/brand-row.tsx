@@ -2,13 +2,13 @@ import Link from 'next/link';
 
 const BRANDS = [
   { name: 'Toyota', logo: '/Toyota-Logo.png', url: '/used?make=Toyota' },
-  { name: 'Nissan', logo: '/Nissan-Logo.png', url: '/used?make=Nissan' },
+  { name: 'Nissan', logo: '/Nissan-logo.png', url: '/used?make=Nissan' },
   { name: 'Mazda', logo: '/Mazda-Logo.png', url: '/used?make=Mazda' },
   { name: 'Subaru', logo: '/Subaru-Logo.png', url: '/used?make=Subaru' },
   { name: 'Mitsubishi', logo: '/Mitsubishi-Logo.png', url: '/used?make=Mitsubishi' },
   { name: 'Honda', logo: '/Honda-Logo.png', url: '/used?make=Honda' },
   { name: 'Isuzu', logo: '/Isuzu-Logo.png', url: '/used?make=Isuzu' },
-  { name: 'Mercedes-Benz', logo: '/Mercedes-Logo.png', url: '/used?make=Mercedes-Benz' }
+  { name: 'Mercedes-Benz', logo: '/Mercedes-Logo.png', url: '/used?make=Mercedes Benz' }
 ];
 
 export function BrandRow() {

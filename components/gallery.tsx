@@ -1,66 +1,132 @@
 'use client';
+
 import { useState } from 'react';
-import { CldImage } from 'next-cloudinary';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import clsx from 'clsx';
+import { CldImage } from '@/components/cld-image';
+import { Expand } from 'lucide-react';
+import { Lightbox, type LightboxImage } from '@/components/lightbox';
 
-export function Gallery({ images, carMeta }: { images: any[], carMeta?: { year: number, make: string, model: string } }) {
-  const [currentIndex, setCurrentIndex] = useState(0);
+type Props = {
+  images: LightboxImage[];
+  make: string;
+  model: string;
+  year: number;
+};
 
-  if (!images || images.length === 0) {
-    return <div className="aspect-[4/3] bg-sky flex items-center justify-center text-slate">No photos</div>;
-  }
+export function Gallery({ images, make, model, year }: Props) {
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
-  const next = () => setCurrentIndex((i) => (i + 1) % images.length);
-  const prev = () => setCurrentIndex((i) => (i - 1 + images.length) % images.length);
+  if (!images.length) return null;
+
+  const [primary, ...thumbs] = images;
+
+  function open(index: number) { setLightboxIndex(index); }
+  function close()             { setLightboxIndex(null);  }
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="relative aspect-[4/3] rounded-[var(--radius-card)] overflow-hidden bg-sky">
-        <CldImage
-          src={images[currentIndex].public_id}
-          alt={carMeta ? `${carMeta.year} ${carMeta.make} ${carMeta.model} interior dashboard view - Coastlane Motors` : (images[currentIndex].alt || `Vehicle image ${currentIndex + 1}`)}
-          fill
-          sizes="(max-width: 1024px) 100vw, 60vw"
-          className="object-cover"
-          priority={currentIndex === 0}
-          fetchPriority={currentIndex === 0 ? "high" : "auto"}
-        />
-        
-        {images.length > 1 && (
-          <>
-            <button onClick={prev} className="absolute left-2 top-1/2 -translate-y-1/2 flex items-center justify-center w-11 h-11 bg-white/80 hover:bg-white rounded-full text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-azure" aria-label="Previous image">
-              <ChevronLeft size={24} aria-hidden="true" />
-            </button>
-            <button onClick={next} className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center justify-center w-11 h-11 bg-white/80 hover:bg-white rounded-full text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-azure" aria-label="Next image">
-              <ChevronRight size={24} aria-hidden="true" />
-            </button>
-          </>
+    <>
+      {/* ── grid ── */}
+      <div className="flex flex-col gap-2">
+
+        {/* main / cover image */}
+        <button
+          type="button"
+          onClick={() => open(0)}
+          aria-label={`View ${year} ${make} ${model} — photo 1 in full screen`}
+          className="group relative w-full aspect-[4/3] sm:aspect-[16/9]
+                     rounded-xl overflow-hidden bg-[#E8F4FD] cursor-zoom-in"
+        >
+          <CldImage
+            src={primary.public_id}
+            alt={primary.alt || `${year} ${make} ${model}`}
+            fill
+            crop="fill"
+            gravity="auto"
+            format="auto"
+            quality="auto"
+            priority
+            sizes="(max-width:768px) 100vw, 60vw"
+            className="object-cover transition-transform duration-300
+                       group-hover:scale-[1.02]"
+          />
+
+          {/* expand hint */}
+          <div className="absolute bottom-3 right-3
+                          flex items-center gap-1.5
+                          bg-black/50 rounded-lg px-2.5 py-1.5
+                          opacity-0 group-hover:opacity-100
+                          transition-opacity duration-200 pointer-events-none">
+            <Expand size={14} aria-hidden="true" className="text-white" />
+            <span className="font-[Poppins] text-[11px] text-white font-medium">
+              View full screen
+            </span>
+          </div>
+
+          {/* photo count badge — always visible */}
+          <div className="absolute bottom-3 left-3
+                          bg-black/50 rounded-lg px-2.5 py-1.5
+                          font-[Poppins] text-[11px] text-white">
+            1 / {images.length}
+          </div>
+        </button>
+
+        {/* thumbnail row — up to 4 shown, last shows "+N more" */}
+        {thumbs.length > 0 && (
+          <div className="grid grid-cols-4 gap-2">
+            {thumbs.slice(0, 4).map((img, i) => {
+              const actualIndex = i + 1;
+              const isLast      = i === 3 && images.length > 5;
+              const remaining   = images.length - 5;
+
+              return (
+                <button
+                  key={img.public_id}
+                  type="button"
+                  onClick={() => open(actualIndex)}
+                  aria-label={
+                    isLast
+                      ? `View all ${images.length} photos`
+                      : `View photo ${actualIndex + 1} in full screen`
+                  }
+                  className="group relative aspect-[4/3] rounded-lg
+                             overflow-hidden bg-[#E8F4FD] cursor-zoom-in"
+                >
+                  <CldImage
+                    src={img.public_id}
+                    alt={img.alt || `${year} ${make} ${model} photo ${actualIndex + 1}`}
+                    fill
+                    crop="fill"
+                    gravity="auto"
+                    format="auto"
+                    quality="auto"
+                    sizes="25vw"
+                    className="object-cover transition-transform duration-300
+                               group-hover:scale-[1.04]"
+                  />
+
+                  {/* "+N more" overlay on the last thumbnail */}
+                  {isLast && (
+                    <div className="absolute inset-0 bg-black/55 flex items-center
+                                    justify-center">
+                      <span className="font-[Poppins] text-[15px] font-bold text-white">
+                        +{remaining + 1}
+                      </span>
+                    </div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
         )}
       </div>
-      
-      {images.length > 1 && (
-        <div className="flex gap-2 overflow-x-auto pb-2 snap-x hide-scrollbar" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-          {images.map((img, i) => (
-            <button 
-              key={img.public_id} 
-              onClick={() => setCurrentIndex(i)}
-              className={clsx(
-                "relative h-20 w-28 shrink-0 rounded-[var(--radius-card)] overflow-hidden snap-start focus:outline-none focus-visible:ring-2 focus-visible:ring-azure",
-                currentIndex === i ? "ring-2 ring-azure opacity-100" : "opacity-60 hover:opacity-100"
-              )}
-            >
-              <CldImage
-                src={img.public_id}
-                alt=""
-                fill
-                sizes="112px"
-                className="object-cover"
-              />
-            </button>
-          ))}
-        </div>
+
+      {/* ── lightbox ── */}
+      {lightboxIndex !== null && (
+        <Lightbox
+          images={images}
+          initialIndex={lightboxIndex}
+          onClose={close}
+        />
       )}
-    </div>
+    </>
   );
 }

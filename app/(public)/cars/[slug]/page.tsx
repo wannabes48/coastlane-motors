@@ -99,7 +99,12 @@ export default async function CarDetail({ params }: { params: Promise<{ slug: st
                   SOLD
                 </div>
               )}
-            <Gallery images={car.images || []} carMeta={{ year: car.year, make: car.make, model: car.model }} />
+            <Gallery 
+              images={car.images || []} 
+              make={car.make} 
+              model={car.model} 
+              year={car.year} 
+            />
           </div>
 
           <div className="flex-1 space-y-8">

@@ -11,8 +11,9 @@ const BUCKETS = [
 
 function bucketHref(min: number | null, max: number | null) {
   const params = new URLSearchParams();
-  if (min) params.set('min', String(min));
-  if (max) params.set('max', String(max));
+  params.set('tab', 'used');        // always explicit
+  if (min != null) params.set('min', String(min));
+  if (max != null) params.set('max', String(max));
   return `/used?${params.toString()}`;
 }
 

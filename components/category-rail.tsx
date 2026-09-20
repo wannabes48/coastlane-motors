@@ -3,19 +3,21 @@ import { useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight, CarFront } from 'lucide-react';
+import { VanIcon } from '@/components/icons/van';
 
 const CATEGORIES = [
-  { name: 'SUV', url: '/used?body=SUV' },
-  { name: 'Sedan', url: '/used?body=Sedan' },
-  { name: 'Hatchback', url: '/used?body=Hatchback' },
-  { name: 'Station Wagon', url: '/used?body=Wagon' },
-  { name: 'Double Cab', url: '/used?body=Pickup' },
-  { name: 'Minibus', url: '/used?body=Bus' },
-  { name: 'Pickup', url: '/used?body=Pickup' },
-  { name: 'Coupe', url: '/used?body=Coupe' }
+  { name: 'SUV', url: '/used?body=SUV&tab=used', body: 'SUV' },
+  { name: 'Sedan', url: '/used?body=Sedan&tab=used', body: 'Sedan' },
+  { name: 'Hatchback', url: '/used?body=Hatchback&tab=used', body: 'Hatchback' },
+  { name: 'Station Wagon', url: '/used?body=Station%20Wagon&tab=used', body: 'Station Wagon' },
+  { name: 'Double Cab', url: '/used?body=Double%20Cab&tab=used', body: 'Double Cab' },
+  { name: 'Van', url: '/used?body=Van&tab=used', body: 'Van' },
+  { name: 'Minibus', url: '/used?body=Minibus&tab=used', body: 'Minibus' },
+  { name: 'Pickup', url: '/used?body=Pickup&tab=used', body: 'Pickup' },
+  { name: 'Coupe', url: '/used?body=Coupe&tab=used', body: 'Coupe' }
 ];
 
-export function CategoryRail({ counts }: { counts: Record<string, number> }) {
+export function CategoryRail({ counts }: { counts: Record<string, { used: number; new: number }> }) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const scroll = (direction: 'left' | 'right') => {
@@ -47,31 +49,39 @@ export function CategoryRail({ counts }: { counts: Record<string, number> }) {
         className="flex overflow-x-auto snap-x snap-mandatory gap-4 px-4 max-w-7xl mx-auto pb-4 hide-scrollbar"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
-        {CATEGORIES.map(cat => (
-          <Link key={cat.name} href={cat.url} className="snap-start shrink-0 w-36 h-36 bg-white rounded-[var(--radius-card)] shadow-[var(--shadow-card)] flex flex-col items-center justify-center p-4 hover:shadow-md transition-shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-azure group">
-            {cat.name === 'SUV' ? (
-              <Image src="/suv-icon.png" alt="SUV" width={48} height={48} className="mb-3 opacity-70 group-hover:opacity-100 transition-opacity" />
-            ) : cat.name === 'Sedan' ? (
-              <Image src="/sedan-icon.png" alt="Sedan" width={48} height={48} className="mb-3 opacity-70 group-hover:opacity-100 transition-opacity" />
-            ) : cat.name === 'Hatchback' ? (
-              <Image src="/hatchback-icon.png" alt="Hatchback" width={48} height={48} className="mb-3 opacity-70 group-hover:opacity-100 transition-opacity" />
-            ) : cat.name === 'Station Wagon' ? (
-              <Image src="/wagon-icon.png" alt="Station Wagon" width={48} height={48} className="mb-3 opacity-70 group-hover:opacity-100 transition-opacity" />
-            ) : cat.name === 'Double Cab' ? (
-              <Image src="/doublecab-icon.png" alt="Double Cab" width={48} height={48} className="mb-3 opacity-70 group-hover:opacity-100 transition-opacity" />
-            ) : cat.name === 'Minibus' ? (
-              <Image src="/minibus-icon.png" alt="Minibus" width={48} height={48} className="mb-3 opacity-70 group-hover:opacity-100 transition-opacity" />
-            ) : cat.name === 'Pickup' ? (
-              <Image src="/pickup-icon.png" alt="Pickup" width={48} height={48} className="mb-3 opacity-70 group-hover:opacity-100 transition-opacity" />
-            ) : cat.name === 'Coupe' ? (
-              <Image src="/coupe-icon.png" alt="Coupe" width={48} height={48} className="mb-3 opacity-70 group-hover:opacity-100 transition-opacity" />
-            ) : (
-              <CarFront size={48} aria-hidden="true" className="text-ink/60 stroke-[1.5px] group-hover:text-azure transition-colors mb-3" />
-            )}
-            <h3 className="font-sans font-semibold text-ink text-center leading-tight">{cat.name}</h3>
-            <p className="text-slate text-step--1 mt-1">{counts[cat.name] || 0} cars</p>
-          </Link>
-        ))}
+        {CATEGORIES.map(cat => {
+          const c = counts[cat.body] ?? { used: 0, new: 0 };
+          const total = c.used + c.new;
+          return (
+            <Link key={cat.name} href={cat.url} className="snap-start shrink-0 w-[160px] h-36 bg-white rounded-[var(--radius-card)] shadow-[var(--shadow-card)] flex flex-col items-center justify-center p-4 hover:shadow-md transition-shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-azure group">
+              {cat.name === 'SUV' ? (
+                <Image src="/suv-icon.png" alt="SUV" width={48} height={48} className="mb-3 opacity-70 group-hover:opacity-100 transition-opacity" />
+              ) : cat.name === 'Sedan' ? (
+                <Image src="/sedan-icon.png" alt="Sedan" width={48} height={48} className="mb-3 opacity-70 group-hover:opacity-100 transition-opacity" />
+              ) : cat.name === 'Hatchback' ? (
+                <Image src="/hatchback-icon.png" alt="Hatchback" width={48} height={48} className="mb-3 opacity-70 group-hover:opacity-100 transition-opacity" />
+              ) : cat.name === 'Station Wagon' ? (
+                <Image src="/wagon-icon.png" alt="Station Wagon" width={48} height={48} className="mb-3 opacity-70 group-hover:opacity-100 transition-opacity" />
+              ) : cat.name === 'Double Cab' ? (
+                <Image src="/doublecab-icon.png" alt="Double Cab" width={48} height={48} className="mb-3 opacity-70 group-hover:opacity-100 transition-opacity" />
+              ) : cat.name === 'Minibus' ? (
+                <Image src="/minibus-icon.png" alt="Minibus" width={48} height={48} className="mb-3 opacity-70 group-hover:opacity-100 transition-opacity" />
+              ) : cat.name === 'Pickup' ? (
+                <Image src="/pickup-icon.png" alt="Pickup" width={48} height={48} className="mb-3 opacity-70 group-hover:opacity-100 transition-opacity" />
+              ) : cat.name === 'Coupe' ? (
+                <Image src="/coupe-icon.png" alt="Coupe" width={48} height={48} className="mb-3 opacity-70 group-hover:opacity-100 transition-opacity" />
+              ) : cat.name === 'Van' ? (
+                <Image src="/van-icon.png" alt="Van" width={48} height={48} className="mb-3 opacity-70 group-hover:opacity-100 transition-opacity" />
+              ) : (
+                <CarFront size={48} aria-hidden="true" className="text-ink/60 stroke-[1.5px] group-hover:text-azure transition-colors mb-3" />
+              )}
+              <h3 className="font-sans font-semibold text-ink text-center leading-tight">{cat.name}</h3>
+              <p className="text-slate text-step--2 mt-1">
+                {total === 0 ? 'No cars' : `${c.used} used · ${c.new} new`}
+              </p>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );

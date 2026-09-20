@@ -24,8 +24,8 @@ export async function listVehicles(f: Filters) {
   if (f.body)         q = q.eq('body_type', f.body);
   if (f.fuel)         q = q.eq('fuel', f.fuel);
   if (f.transmission) q = q.eq('transmission', f.transmission);
-  if (f.min)          q = q.gte('price_kes', f.min);
-  if (f.max)          q = q.lte('price_kes', f.max);
+  if (f.min != null)  q = q.gte('price_kes', f.min);
+  if (f.max != null)  q = q.lte('price_kes', f.max);
   if (f.yearFrom)     q = q.gte('year', f.yearFrom);
 
   q = q.order('status', { ascending: true });        // published before sold
@@ -56,19 +56,18 @@ export async function getVehicle(slug: string) {
   return data;
 }
 
-export async function getCategoryCounts() {
+export async function getCategoryCountsByCondition() {
   const supabase = await supabaseServer();
-  const { data } = await supabase.from('vehicles')
-    .select('body_type')
-    .in('status', ['published', 'sold']);
-    
-  const counts: Record<string, number> = {};
-  if (data) {
-    for (const row of data) {
-      if (row.body_type) {
-        counts[row.body_type] = (counts[row.body_type] || 0) + 1;
-      }
-    }
+  const { data } = await supabase
+    .from('vehicles')
+    .select('body_type, condition')
+    .eq('status', 'published');
+
+  const counts: Record<string, { used: number; new: number }> = {};
+  for (const row of data ?? []) {
+    if (!row.body_type) continue;
+    if (!counts[row.body_type]) counts[row.body_type] = { used: 0, new: 0 };
+    counts[row.body_type][row.condition as 'used' | 'new']++;
   }
   return counts;
 }

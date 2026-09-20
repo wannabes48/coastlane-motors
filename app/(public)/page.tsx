@@ -18,7 +18,7 @@ import { HowItWorks }    from '@/components/home/how-it-works';
 import { RecentlySold }  from '@/components/home/recently-sold';
 import { Testimonials }  from '@/components/home/testimonials';
 import { CTABand }       from '@/components/home/cta-band';
-import { getCategoryCounts } from '@/lib/queries';
+import { getCategoryCountsByCondition } from '@/lib/queries';
 
 export const revalidate = 300; // revalidate every 5 minutes
 
@@ -41,7 +41,7 @@ function SectionSkeleton({ height = 200 }: { height?: number }) {
 }
 
 export default async function HomePage() {
-  const counts = await getCategoryCounts();
+  const counts = await getCategoryCountsByCondition();
 
   return (
     <main>

@@ -1,5 +1,6 @@
-import { Listings } from '@/components/listings';
+import { ListingsPage } from '@/components/listings-page';
 import { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 
 export async function generateMetadata({ searchParams }: { searchParams: Promise<any> }): Promise<Metadata> {
   const params = await searchParams;
@@ -17,6 +18,11 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
 
 export const revalidate = 300;
 
-export default function UsedPage({ searchParams }: { searchParams: Promise<any> }) {
-  return <Listings searchParams={searchParams} condition="used" />;
+export default async function UsedPage({ searchParams }: { searchParams: Promise<any> }) {
+  const params = await searchParams;
+  if (params.tab === 'new') {
+    const sp = new URLSearchParams(params);
+    redirect(`/new?${sp.toString()}`);
+  }
+  return <ListingsPage searchParams={params} defaultTab="used" />;
 }

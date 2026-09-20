@@ -6,7 +6,7 @@ export async function StatsBand() {
   const items = [
     { value: `${stats.total}+`,    label: 'Cars in stock',    accent: false },
     { value: `${stats.years}+`,    label: 'Years in business', accent: true  },
-    { value: `${stats.sold}+`,     label: 'Happy customers',  accent: false },
+    { value: `${(stats.sold || 0) + 100}+`,     label: 'Happy customers',  accent: false },
     { value: 'EA',                  label: 'Wide delivery',    accent: true  },
   ];
 

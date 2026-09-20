@@ -31,7 +31,7 @@ export function HeroSearch() {
       </div>
 
       <div className="px-4 md:px-0 relative z-10 -mt-7 mb-7 md:-mt-10 md:mb-10 max-w-4xl mx-auto">
-        <form method="GET" action="/used"
+        <form method="GET" action="/cars"
               className="
                 flex flex-col gap-[1px] bg-line md:gap-0
                 md:flex-row md:items-stretch

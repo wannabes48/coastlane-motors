@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { LOCATIONS } from '@/lib/locations';
 import { SlidersHorizontal, X } from 'lucide-react';
 
-export function FilterRail({ counts }: { counts?: Record<string, number> }) {
+export function FilterRail({ counts, tab, basePath = '/used' }: { counts?: Record<string, number>, tab?: string, basePath?: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [open, setOpen] = useState(false);
@@ -14,7 +14,7 @@ export function FilterRail({ counts }: { counts?: Record<string, number> }) {
     if (value) params.set(key, value);
     else params.delete(key);
     params.delete('page'); // Reset to page 1
-    router.push(`?${params.toString()}`);
+    router.push(`${basePath}?${params.toString()}`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -118,7 +118,7 @@ export function FilterRail({ counts }: { counts?: Record<string, number> }) {
               <FilterFields />
             </div>
             <div className="flex gap-3 p-4 border-t border-line shrink-0">
-              <button onClick={() => { router.push('?'); window.scrollTo({ top: 0, behavior: 'smooth' }); setOpen(false); }}
+              <button onClick={() => { router.push(basePath); window.scrollTo({ top: 0, behavior: 'smooth' }); setOpen(false); }}
                       className="flex-1 h-12 border border-line rounded-[var(--radius-card)] font-semibold text-ink hover:bg-sky transition-colors">
                 Clear all
               </button>
@@ -135,7 +135,7 @@ export function FilterRail({ counts }: { counts?: Record<string, number> }) {
       <aside className="hidden md:block w-64 shrink-0 bg-white p-6 rounded-[var(--radius-card)] shadow-[var(--shadow-card)] h-fit sticky top-24">
         <FilterFields />
         <button 
-          onClick={() => { router.push('?'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+          onClick={() => { router.push(basePath); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
           className="w-full mt-6 text-slate hover:text-ink text-sm py-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-azure rounded-[var(--radius-card)] h-11"
         >
           Clear all filters

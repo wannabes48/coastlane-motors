@@ -19,7 +19,6 @@ export function LiveViewCount({ slug, initial }: { slug: string; initial: number
 
   return (
     <span className="flex items-center gap-1.5 text-slate text-sm">
-      <Eye size={15} aria-hidden="true" />
       {count.toLocaleString()} {count === 1 ? 'view' : 'views'}
     </span>
   );

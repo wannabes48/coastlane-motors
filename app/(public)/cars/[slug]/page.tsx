@@ -103,13 +103,24 @@ export default async function CarDetail({ params }: { params: Promise<{ slug: st
       <ViewCounter slug={car.slug} />
       <div className="max-w-7xl mx-auto px-4 py-8 lg:py-12">
 
-        {/* breadcrumb */}
-        <div className="flex items-center text-sm text-slate mb-6">
-          <Link href="/" className="hover:text-ink transition-colors">Home</Link>
-          <span className="mx-2">/</span>
-          <Link href={`/${car.condition}`} className="hover:text-ink transition-colors capitalize">{car.condition}</Link>
-          <span className="mx-2">/</span>
-          <span className="text-ink">{car.make} {car.model}</span>
+        {/* breadcrumb + back button */}
+        <div className="flex items-center justify-between text-sm text-slate mb-6">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <Link href="/" className="hover:text-ink transition-colors">Home</Link>
+            <span>/</span>
+            <Link href={`/${car.condition}`} className="hover:text-ink transition-colors capitalize">{car.condition}</Link>
+            <span>/</span>
+            <span className="text-ink truncate max-w-[140px] sm:max-w-none">{car.make} {car.model}</span>
+          </div>
+          {/* Back button — always visible, prominent on mobile */}
+          <Link
+            href={`/${car.condition}`}
+            className="flex items-center gap-1.5 h-9 px-4 bg-white border border-line rounded-full font-sans text-[13px] font-semibold text-ink hover:border-azure transition-colors shrink-0 ml-3"
+          >
+            <ArrowRight size={14} className="rotate-180 text-azure" aria-hidden="true" />
+            <span className="hidden sm:inline">All {car.condition} cars</span>
+            <span className="sm:hidden">Back</span>
+          </Link>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-12 lg:items-start">

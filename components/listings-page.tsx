@@ -4,7 +4,7 @@ import { listVehicles } from '@/lib/queries';
 import { CarCard }    from '@/components/car-card';
 import { FilterRail } from '@/components/filter-rail';
 import { Pagination } from '@/components/pagination';
-import { Search }     from 'lucide-react';
+import { Search, ArrowRight } from 'lucide-react';
 
 const BRANDS = [
   { name: 'Toyota',        logo: '/Toyota-Logo.png',     slug: 'toyota' },
@@ -110,12 +110,26 @@ export async function ListingsPage({
 
       <div className="max-w-7xl mx-auto px-4 py-4">
 
-        {/* Search result heading */}
-        {searchParams.q && (
-          <p className="font-sans text-[13px] text-slate mb-3">
-            Results for <span className="font-semibold text-ink">"{searchParams.q}"</span>
-          </p>
-        )}
+        {/* Search result heading + Back button */}
+        <div className="flex items-center justify-between mb-3 min-h-[32px]">
+          {searchParams.q ? (
+            <p className="font-sans text-[13px] text-slate">
+              Results for <span className="font-semibold text-ink">"{searchParams.q}"</span>
+            </p>
+            
+
+          ) : <div />}
+
+          {['/cars', '/used', '/new'].includes(basePath) && (
+            <Link
+              href="/"
+              className="flex items-center gap-1.5 h-8 px-3 bg-white border border-line rounded-full font-sans text-[12px] font-semibold text-ink hover:border-azure transition-colors shrink-0 ml-auto"
+            >
+              <ArrowRight size={14} className="rotate-180 text-azure" aria-hidden="true" />
+              Back to home
+            </Link>
+          )}
+        </div>
 
         {/* ── Mobile filter + sort bar ── */}
         <div className="lg:hidden mb-4">

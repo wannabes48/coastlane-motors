@@ -29,9 +29,9 @@ export async function InStock() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
           {featured.length > 0 ? (
-            featured.map(car => <CarCard key={car.id} car={car} />)
+            featured.map((car, i) => <CarCard key={car.id} car={car} priority={i === 0} />)
           ) : (
             <p className="text-[#6B7D8F] font-[Poppins] text-[13px] col-span-full py-12 text-center bg-[#E8F4FD] rounded-lg">No vehicles in stock yet.</p>
           )}

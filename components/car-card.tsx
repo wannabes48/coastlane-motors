@@ -6,7 +6,7 @@ import clsx from 'clsx';
 import { Eye, Gauge, Settings2, MapPin, ArrowRight } from 'lucide-react';
 import { WhatsAppIcon } from '@/components/whatsapp-icon';
 
-export function CarCard({ car }: { car: any }) {
+export function CarCard({ car, priority = false }: { car: any; priority?: boolean }) {
   const isSold = car.status === 'sold';
   
   return (
@@ -19,7 +19,7 @@ export function CarCard({ car }: { car: any }) {
         {car.images?.[0] ? (
           <CldImage
             src={car.images[0].public_id}
-            alt={car.images[0].alt || `${car.year} ${car.make} ${car.model}`}
+            alt={car.images[0].alt || `${car.year} ${car.make} ${car.model} — ${car.condition} car for sale in ${car.city ?? 'Kenya'}`}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             className={clsx("w-full h-full object-cover transition-transform group-hover:scale-105 duration-500", isSold && "grayscale")}
@@ -27,6 +27,7 @@ export function CarCard({ car }: { car: any }) {
             gravity="auto"
             format="auto"
             quality="auto"
+            priority={priority}
           />
         ) : (
            <div className="absolute inset-0 flex items-center justify-center text-slate">

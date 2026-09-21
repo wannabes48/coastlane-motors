@@ -7,7 +7,7 @@ import { Pagination }   from '@/components/pagination';
 type Props = {
   searchParams: Record<string, string>;
   defaultTab: 'used' | 'new';
-  basePath?: '/used' | '/new' | '/cars';
+  basePath?: string;
 };
 
 export async function ListingsPage({
@@ -127,8 +127,8 @@ export async function ListingsPage({
 
             {vehicles.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {vehicles.map((car) => (
-                  <CarCard key={car.id} car={car} />
+                {vehicles.map((car, i) => (
+                  <CarCard key={car.id} car={car} priority={i === 0} />
                 ))}
               </div>
             ) : (

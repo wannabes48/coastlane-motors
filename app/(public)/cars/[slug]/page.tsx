@@ -3,10 +3,11 @@ import { Gallery } from '@/components/gallery';
 import { CarNav } from '@/components/car-nav';
 import { SimilarCars } from '@/components/similar-cars';
 import { WhatsAppButton } from '@/components/whatsapp-button';
+import { ShareButton } from '@/components/share-button';
 import { fmtKES } from '@/lib/money';
 import { waLink } from '@/lib/whatsapp';
 import { Metadata } from 'next';
-import { Phone, Eye, Gauge, Settings2, MapPin } from 'lucide-react';
+import { Phone, Eye, Gauge, Settings2, MapPin, ArrowRight } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ViewCounter } from './view-counter';
@@ -18,10 +19,25 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const car = await getVehicle(slug);
   if (!car) return {};
-  const title = `${car.year} ${car.make} ${car.model} — ${fmtKES(car.price_kes)}`.trim();
+  
+  const priceStr = car.price_kes ? `KSh ${car.price_kes.toLocaleString()}` : '';
+  const title = [
+    `${car.year} ${car.make} ${car.model} for Sale`,
+    car.city ? `in ${car.city}` : 'in Kenya',
+    priceStr ? `— ${priceStr}` : '',
+  ].filter(Boolean).join(' ').trim();
+
+  const description = [
+    `${car.year} ${car.make} ${car.model} for sale in ${car.city ?? 'Kenya'}.`,
+    car.mileage_km != null ? `${car.mileage_km.toLocaleString()} km,` : '',
+    car.transmission ? `${car.transmission},` : '',
+    car.fuel ? `${car.fuel}.` : '',
+    'Duty paid, clearly priced in KES. WhatsApp Coastlane Motors to arrange a viewing.',
+  ].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
+
   return {
     title,
-    description: `${title} for sale in ${car.city}. ${car.mileage_km?.toLocaleString() ?? ''}km, ${car.transmission ?? ''}, ${car.fuel ?? ''}. Photos, specs and WhatsApp contact.`,
+    description,
     alternates: { canonical: `/cars/${car.slug}` },
     openGraph: { type: 'website', title, images: [{ url: `/cars/${car.slug}/opengraph-image` }] },
     robots: car.status === 'sold' ? { index: false, follow: true } : { index: true, follow: true },
@@ -154,6 +170,7 @@ export default async function CarDetail({ params }: { params: Promise<{ slug: st
                   <Phone size={16} className="text-azure" aria-hidden="true" />
                   Call us
                 </a>
+                <ShareButton car={{ slug: car.slug, year: car.year, make: car.make, model: car.model, price_kes: car.price_kes }} />
               </div>
             )}
 
@@ -233,6 +250,43 @@ export default async function CarDetail({ params }: { params: Promise<{ slug: st
                 </ul>
               </div>
             )}
+
+            {/* About this car — auto-generated SEO copy */}
+            <div className="mt-2 bg-white border border-line rounded-[var(--radius-lg)] p-4">
+              <h2 className="font-sans text-[13px] font-semibold text-ink mb-2">
+                About this {car.make} {car.model}
+              </h2>
+              <p className="font-sans text-[13px] text-slate leading-relaxed">
+                The {car.year} {car.make} {car.model} is a {car.condition}{' '}
+                {car.body_type?.toLowerCase() ?? 'vehicle'}
+                {car.mileage_km != null ? ` with ${car.mileage_km.toLocaleString()} km on the clock` : ''}.
+                {car.transmission ? ` It comes with a ${car.transmission.toLowerCase()} gearbox` : ''}
+                {car.fuel ? ` and runs on ${car.fuel.toLowerCase()}` : ''}.
+                {' '}Duty is fully paid — no additional import costs.
+                {car.city ? ` Located in ${car.city}, Kenya.` : ' Located in Kenya.'}
+                {' '}WhatsApp us to arrange a viewing.
+              </p>
+            </div>
+
+            {/* Internal category links — build topical authority */}
+            <div className="flex flex-wrap gap-2 mt-1">
+              {car.make && (
+                <Link
+                  href={`/used/${car.make.toLowerCase().replace(/\s+/g, '-')}`}
+                  className="flex items-center gap-1 font-sans text-[12px] text-azure hover:underline"
+                >
+                  More {car.make} vehicles <ArrowRight size={12} aria-hidden="true" />
+                </Link>
+              )}
+              {car.body_type && (
+                <Link
+                  href={`/used/${car.body_type.toLowerCase().replace(/\s+/g, '-')}`}
+                  className="flex items-center gap-1 font-sans text-[12px] text-azure hover:underline"
+                >
+                  More {car.body_type}s <ArrowRight size={12} aria-hidden="true" />
+                </Link>
+              )}
+            </div>
             
           </div>
         </div>

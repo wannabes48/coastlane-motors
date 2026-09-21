@@ -8,8 +8,8 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
   const base = `${process.env.NEXT_PUBLIC_SITE_URL}/new`;
 
   return {
-    title: 'New Cars for Sale in Kenya',
-    description: 'Browse verified new cars for sale in Kenya. Clear prices, full photos, duty paid.',
+    title: 'New Cars for Sale in Kenya (2026) — Coastlane Motors',
+    description: 'Buy new cars in Kenya with transparent KES pricing and full dealer support. Browse our new stock — Toyota, Mazda, Nissan and more. Call or WhatsApp Coastlane Motors today.',
     alternates: {
       canonical: page === 1 ? base : `${base}?page=${page}`,
     },

@@ -18,6 +18,7 @@ import { HowItWorks }    from '@/components/home/how-it-works';
 import { RecentlySold }  from '@/components/home/recently-sold';
 import { Testimonials }  from '@/components/home/testimonials';
 import { CTABand }       from '@/components/home/cta-band';
+import { FAQ }           from '@/components/home/faq';
 import { getCategoryCountsByCondition } from '@/lib/queries';
 
 export const revalidate = 300; // revalidate every 5 minutes
@@ -25,7 +26,7 @@ export const revalidate = 300; // revalidate every 5 minutes
 export const metadata: Metadata = {
   title: 'Coastlane Motors — Used & New Cars for Sale in Kenya',
   description:
-    'Browse verified used and new cars for sale in Kenya. Clear prices, full photos, duty paid. WhatsApp us to view or reserve.',
+    'Browse verified used and new cars for sale in Kenya. Duty paid, clearly priced in KES, real yard photos. Toyota, Mazda, Subaru and more. WhatsApp us to view today.',
   alternates: { canonical: '/' },
 };
 
@@ -69,7 +70,10 @@ export default async function HomePage() {
         <InStock />
       </Suspense>
 
-      {/* ⑥ Budget finder — second most common navigation path */}
+      {/* ⑥ FAQ — featured snippets + FAQPage schema */}
+      <FAQ />
+
+      {/* ⑦ Budget finder — second most common navigation path */}
       <Suspense fallback={<SectionSkeleton height={260} />}>
         <BudgetFinder />
       </Suspense>

@@ -37,7 +37,7 @@ export function Gallery({ images, make, model, year }: Props) {
         >
           <CldImage
             src={primary.public_id}
-            alt={primary.alt || `${year} ${make} ${model}`}
+            alt={primary.alt || `${year} ${make} ${model} — ${make} for sale in Kenya`}
             fill
             crop="fill"
             gravity="auto"

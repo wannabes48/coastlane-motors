@@ -1,192 +1,118 @@
 'use client';
-import React, { useEffect, useState } from 'react'
-import { motion, useAnimation } from 'framer-motion'
-import { Search } from 'lucide-react'
+import { useEffect, useState } from 'react';
 
-// Interface for grid configuration structure
-interface GridConfig {
-    numCards: number // Total number of cards to display
-    cols: number // Number of columns in the grid
-    xBase: number // Base x-coordinate for positioning
-    yBase: number // Base y-coordinate for positioning
-    xStep: number // Horizontal step between cards
-    yStep: number // Vertical step between cards
+// Single shimmer card matching the real CarCard proportions
+function SkeletonCard() {
+  return (
+    <div className="flex flex-col bg-white border border-line rounded-[var(--radius-lg)] overflow-hidden">
+      {/* photo area 4:3 */}
+      <div className="aspect-[4/3] bg-[#E8F4FD] animate-pulse" />
+      {/* body */}
+      <div className="p-3.5 flex flex-col gap-2">
+        <div className="h-3.5 w-3/4 rounded bg-[#E2EEF8] animate-pulse" />
+        <div className="h-5 w-1/2 rounded bg-[#DDE8F5] animate-pulse" />
+        <div className="flex gap-2 mt-1">
+          <div className="h-2.5 w-16 rounded bg-[#E8F4FD] animate-pulse" />
+          <div className="h-2.5 w-16 rounded bg-[#E8F4FD] animate-pulse" />
+        </div>
+      </div>
+      {/* footer */}
+      <div className="flex items-center justify-between px-3.5 py-2.5 border-t border-line">
+        <div className="h-6 w-20 rounded-full bg-[#E8F4FD] animate-pulse" />
+        <div className="h-3 w-12 rounded bg-[#E8F4FD] animate-pulse" />
+      </div>
+    </div>
+  );
 }
 
-const AnimatedLoadingSkeleton = () => {
-    const [windowWidth, setWindowWidth] = useState(0) // State to store window width for responsiveness
-    const controls = useAnimation() // Controls for Framer Motion animations
+// A single shimmer bar with configurable width/height
+function Bar({ w = 'w-full', h = 'h-10', rounded = 'rounded-full' }: { w?: string; h?: string; rounded?: string }) {
+  return <div className={`${w} ${h} ${rounded} bg-[#E8F4FD] animate-pulse`} />;
+}
 
-    // Dynamically calculates grid configuration based on window width
-    const getGridConfig = (width: number): GridConfig => {
-        const numCards = 6 // Fixed number of cards
-        const cols = width >= 1024 ? 3 : width >= 640 ? 2 : 1 // Set columns based on screen width
-        return {
-            numCards,
-            cols,
-            xBase: 40, // Starting x-coordinate
-            yBase: 60, // Starting y-coordinate
-            xStep: 210, // Horizontal spacing
-            yStep: 230 // Vertical spacing
-        }
-    }
+const ListingsLoadingSkeleton = () => {
+  // Avoid SSR mismatch — only render after mount
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return <div className="min-h-screen bg-sky" />;
 
-    // Generates random animation paths for the search icon
-    const generateSearchPath = (config: GridConfig) => {
-        const { numCards, cols, xBase, yBase, xStep, yStep } = config
-        const rows = Math.ceil(numCards / cols) // Calculate rows based on cards and columns
-        let allPositions = []
+  const CARD_COUNT = 6;
 
-        // Generate grid positions for cards
-        for (let row = 0; row < rows; row++) {
-            for (let col = 0; col < cols; col++) {
-                if ((row * cols + col) < numCards) {
-                    allPositions.push({
-                        x: xBase + (col * xStep),
-                        y: yBase + (row * yStep)
-                    })
-                }
-            }
-        }
+  return (
+    <main className="bg-sky min-h-screen">
 
-        // Shuffle positions to create random animations
-        const numRandomCards = 4
-        const shuffledPositions = allPositions
-            .sort(() => Math.random() - 0.5)
-            .slice(0, numRandomCards)
+      {/* ── Sticky top bar (search + tabs) ── */}
+      <div className="bg-white border-b border-line">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col gap-3">
+          {/* search bar */}
+          <Bar w="w-full" h="h-10" rounded="rounded-full" />
+          {/* condition tabs */}
+          <div className="flex gap-1 w-fit">
+            <div className="h-8 w-16 rounded-md bg-[#E2EEF8] animate-pulse" />
+            <div className="h-8 w-16 rounded-md bg-[#E8F4FD] animate-pulse" />
+          </div>
+        </div>
+      </div>
 
-        // Ensure loop completion by adding the starting position
-        shuffledPositions.push(shuffledPositions[0])
+      <div className="max-w-7xl mx-auto px-4 py-4">
 
-        return {
-            x: shuffledPositions.map(pos => pos.x),
-            y: shuffledPositions.map(pos => pos.y),
-            scale: Array(shuffledPositions.length).fill(1.2),
-            transition: {
-                duration: shuffledPositions.length * 2,
-                repeat: Infinity,
-                ease: 'easeInOut' as const,
-                times: shuffledPositions.map((_, i) => i / (shuffledPositions.length - 1))
-            }
-        } as any;
-    }
+        {/* Back / result heading row */}
+        <div className="flex items-center justify-between mb-3 h-8">
+          <div className="h-3.5 w-32 rounded bg-[#E8F4FD] animate-pulse" />
+          <div className="h-8 w-28 rounded-full bg-[#E8F4FD] animate-pulse" />
+        </div>
 
-    // Handles window resize events and updates the window width
-    useEffect(() => {
-        setWindowWidth(window.innerWidth)
-        const handleResize = () => setWindowWidth(window.innerWidth)
-        window.addEventListener('resize', handleResize)
-        return () => window.removeEventListener('resize', handleResize)
-    }, [])
+        {/* ── Mobile filter + sort bar ── */}
+        <div className="flex gap-2 mb-4 lg:hidden">
+          <Bar w="flex-1" h="h-10" rounded="rounded-full" />
+          <div className="h-10 w-28 rounded-full bg-[#E8F4FD] animate-pulse shrink-0" />
+        </div>
 
-    // Updates animation path whenever the window width changes
-    useEffect(() => {
-        if (windowWidth === 0) return;
-        const config = getGridConfig(windowWidth)
-        controls.start(generateSearchPath(config))
-    }, [windowWidth, controls])
-
-    // Variants for frame animations
-    const frameVariants = {
-        hidden: { opacity: 0, scale: 0.95 }, // Initial state (hidden)
-        visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } } // Transition to visible state
-    }
-
-    // Variants for individual card animations
-    const cardVariants = {
-        hidden: { y: 20, opacity: 0 }, // Initial state (off-screen)
-        visible: (i: number) => ({ // Animate based on card index
-            y: 0,
-            opacity: 1,
-            transition: { delay: i * 0.1, duration: 0.4 } // Staggered animation
-        })
-    }
-
-    // Glow effect variants for the search icon
-    const glowVariants = {
-        animate: {
-            boxShadow: [
-                "0 0 20px rgba(59, 130, 246, 0.2)",
-                "0 0 35px rgba(59, 130, 246, 0.4)",
-                "0 0 20px rgba(59, 130, 246, 0.2)"
-            ],
-            scale: [1, 1.1, 1],
-            transition: {
-                duration: 1,
-                repeat: Infinity,
-                ease: "easeInOut"
-            }
-        }
-    } as any;
-
-    const config = getGridConfig(windowWidth) // Get current grid configuration
-
-    // Don't render until client-side hydration (width > 0) to avoid mismatch
-    if (windowWidth === 0) return <div className="min-h-screen" />;
-
-    return (
-        <motion.div
-            className="w-full max-w-4xl mx-auto p-6 bg-white rounded-xl shadow-[var(--shadow-card)]"
-            variants={frameVariants}
-            initial="hidden"
-            animate="visible"
-        >
-            <div className="relative overflow-hidden rounded-lg bg-gradient-to-br from-sky to-white p-8 border border-line">
-                {/* Search icon with animation */}
-                <motion.div
-                    className="absolute z-10 pointer-events-none"
-                    animate={controls}
-                    style={{ left: 24, top: 24 }}
-                >
-                    <motion.div
-                        className="bg-azure/20 p-3 rounded-full backdrop-blur-sm"
-                        variants={glowVariants}
-                        animate="animate"
-                    >
-                        <Search className="w-6 h-6 text-azure" strokeWidth={2} />
-                    </motion.div>
-                </motion.div>
-
-                {/* Grid of animated cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {[...Array(config.numCards)].map((_, i) => (
-                        <motion.div
-                            key={i}
-                            variants={cardVariants}
-                            initial="hidden"
-                            animate="visible"
-                            custom={i} // Index-based animation delay
-                            whileHover={{ scale: 1.02 }} // Slight scale on hover
-                            className="bg-white rounded-lg shadow-sm border border-line p-4"
-                        >
-                            {/* Card placeholders */}
-                            <motion.div
-                                className="h-32 rounded-md mb-3"
-                                animate={{
-                                    background: ["#E2E8F0", "#CBD5E1", "#E2E8F0"],
-                                }}
-                                transition={{ duration: 1.5, repeat: Infinity }}
-                            />
-                            <motion.div
-                                className="h-3 w-3/4 rounded mb-2"
-                                animate={{
-                                    background: ["#E2E8F0", "#CBD5E1", "#E2E8F0"],
-                                }}
-                                transition={{ duration: 1.5, repeat: Infinity }}
-                            />
-                            <motion.div
-                                className="h-3 w-1/2 rounded"
-                                animate={{
-                                    background: ["#E2E8F0", "#CBD5E1", "#E2E8F0"],
-                                }}
-                                transition={{ duration: 1.5, repeat: Infinity }}
-                            />
-                        </motion.div>
-                    ))}
-                </div>
+        {/* ── Brand pills ── */}
+        <div className="mb-5 flex gap-3 overflow-hidden">
+          {[...Array(8)].map((_, i) => (
+            <div key={i} className="shrink-0 flex flex-col items-center gap-1 px-3 py-2 rounded-xl border border-line bg-white">
+              <div className="w-9 h-9 rounded-full bg-[#E8F4FD] animate-pulse" />
+              <div className="h-2.5 w-10 rounded bg-[#E8F4FD] animate-pulse" />
             </div>
-        </motion.div>
-    )
-}
+          ))}
+        </div>
 
-export default AnimatedLoadingSkeleton;
+        <div className="flex gap-6">
+
+          {/* ── Desktop sidebar ── */}
+          <aside className="hidden lg:flex flex-col gap-5 w-64 shrink-0 bg-white p-5 rounded-[var(--radius-card)] shadow-[var(--shadow-card)] h-fit">
+            <div className="flex justify-between mb-1">
+              <div className="h-4 w-14 rounded bg-[#E2EEF8] animate-pulse" />
+              <div className="h-3.5 w-14 rounded bg-[#E8F4FD] animate-pulse" />
+            </div>
+            {/* Filter groups */}
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="flex flex-col gap-1.5">
+                <div className="h-2.5 w-20 rounded bg-[#E8F4FD] animate-pulse" />
+                <div className="h-11 w-full rounded-[var(--radius)] bg-[#E8F4FD] animate-pulse" />
+              </div>
+            ))}
+          </aside>
+
+          {/* ── Results area ── */}
+          <div className="flex-1 min-w-0">
+            {/* Count row */}
+            <div className="flex items-center justify-between mb-4 h-5">
+              <div className="h-3.5 w-36 rounded bg-[#E8F4FD] animate-pulse" />
+            </div>
+
+            {/* Car grid — 2 cols mobile, 3 cols desktop */}
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-6">
+              {[...Array(CARD_COUNT)].map((_, i) => (
+                <SkeletonCard key={i} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  );
+};
+
+export default ListingsLoadingSkeleton;

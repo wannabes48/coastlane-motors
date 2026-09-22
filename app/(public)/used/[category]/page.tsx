@@ -64,6 +64,42 @@ const CATEGORY_MAP: Record<string, CategoryConfig> = {
     h1: 'Used Isuzu for Sale in Kenya',
     filter: { make: 'Isuzu' },
   },
+  bmw: {
+    title: 'Used BMW for Sale in Kenya (2026) — Coastlane Motors',
+    description: 'Browse used BMW vehicles for sale in Kenya — 3 Series, 5 Series, X5 and more. Duty paid, clearly priced in KES. WhatsApp Coastlane Motors to view.',
+    h1: 'Used BMW for Sale in Kenya',
+    filter: { make: 'BMW' },
+  },
+  audi: {
+    title: 'Used Audi for Sale in Kenya (2026) — Coastlane Motors',
+    description: 'Browse used Audi vehicles for sale in Kenya — A3, A4, Q5 and more. Duty paid, clearly priced in KES. WhatsApp Coastlane Motors to view.',
+    h1: 'Used Audi for Sale in Kenya',
+    filter: { make: 'Audi' },
+  },
+  suzuki: {
+    title: 'Used Suzuki Cars for Sale in Kenya (2026) — Coastlane Motors',
+    description: 'Browse used Suzuki vehicles for sale in Kenya — Swift, Vitara, Jimny and more. Duty paid, clearly priced in KES. WhatsApp Coastlane Motors to view.',
+    h1: 'Used Suzuki Cars for Sale in Kenya',
+    filter: { make: 'Suzuki' },
+  },
+  lexus: {
+    title: 'Used Lexus for Sale in Kenya (2026) — Coastlane Motors',
+    description: 'Browse used Lexus vehicles for sale in Kenya — LX, RX, IS and more. Duty paid, clearly priced in KES. WhatsApp Coastlane Motors to view.',
+    h1: 'Used Lexus for Sale in Kenya',
+    filter: { make: 'Lexus' },
+  },
+  volkswagen: {
+    title: 'Used Volkswagen for Sale in Kenya (2026) — Coastlane Motors',
+    description: 'Browse used Volkswagen vehicles for sale in Kenya — Golf, Polo, Tiguan and more. Duty paid, clearly priced in KES. WhatsApp Coastlane Motors to view.',
+    h1: 'Used Volkswagen for Sale in Kenya',
+    filter: { make: 'Volkswagen' },
+  },
+  ford: {
+    title: 'Used Ford Cars for Sale in Kenya (2026) — Coastlane Motors',
+    description: 'Browse used Ford vehicles for sale in Kenya — Ranger, Everest, Explorer and more. Duty paid, clearly priced in KES. WhatsApp Coastlane Motors to view.',
+    h1: 'Used Ford Cars for Sale in Kenya',
+    filter: { make: 'Ford' },
+  },
 
   // — Body types —
   suv: {

@@ -7,14 +7,20 @@ import { Pagination } from '@/components/pagination';
 import { Search, ArrowRight } from 'lucide-react';
 
 const BRANDS = [
-  { name: 'Toyota',        logo: '/Toyota-Logo.png',     slug: 'toyota' },
-  { name: 'Nissan',        logo: '/Nissan-logo.png',     slug: 'nissan' },
-  { name: 'Mazda',         logo: '/Mazda-Logo.png',      slug: 'mazda' },
-  { name: 'Subaru',        logo: '/Subaru-Logo.png',     slug: 'subaru' },
-  { name: 'Mitsubishi',    logo: '/Mitsubishi-Logo.png', slug: 'mitsubishi' },
-  { name: 'Honda',         logo: '/Honda-Logo.png',      slug: 'honda' },
-  { name: 'Isuzu',         logo: '/Isuzu-Logo.png',      slug: 'isuzu' },
-  { name: 'Mercedes-Benz', logo: '/Mercedes-Logo.png',   slug: 'mercedes-benz' },
+  { name: 'Toyota',        logo: '/Toyota-Logo.png',     slug: 'toyota',        make: 'Toyota' },
+  { name: 'Nissan',        logo: '/Nissan-logo.png',     slug: 'nissan',        make: 'Nissan' },
+  { name: 'Mazda',         logo: '/Mazda-Logo.png',      slug: 'mazda',         make: 'Mazda' },
+  { name: 'Subaru',        logo: '/Subaru-Logo.png',     slug: 'subaru',        make: 'Subaru' },
+  { name: 'Mitsubishi',    logo: '/Mitsubishi-Logo.png', slug: 'mitsubishi',    make: 'Mitsubishi' },
+  { name: 'Honda',         logo: '/Honda-Logo.png',      slug: 'honda',         make: 'Honda' },
+  { name: 'Isuzu',         logo: '/Isuzu-Logo.png',      slug: 'isuzu',         make: 'Isuzu' },
+  { name: 'Mercedes-Benz', logo: '/Mercedes-Logo.png',   slug: 'mercedes-benz', make: 'Mercedes Benz' },
+  { name: 'BMW',           logo: '/BMW-Logo.png',        slug: 'bmw',           make: 'BMW' },
+  { name: 'Audi',          logo: '/Audi-Logo.png',       slug: 'audi',          make: 'Audi' },
+  { name: 'Suzuki',        logo: '/Suzuki-Logo.png',     slug: 'suzuki',        make: 'Suzuki' },
+  { name: 'Lexus',         logo: '/Lexus-Logo.svg',      slug: 'lexus',         make: 'Lexus' },
+  { name: 'Volkswagen',    logo: '/Volkswagen-Logo.png', slug: 'volkswagen',    make: 'Volkswagen' },
+  { name: 'Ford',          logo: '/Ford-Logo.png',       slug: 'ford',          make: 'Ford' },
 ];
 
 type Props = {
@@ -141,13 +147,12 @@ export async function ListingsPage({
           <p className="font-sans text-[11px] font-semibold uppercase tracking-[1.5px] text-slate mb-2 hidden lg:block">Browse by brand</p>
           <div className="flex overflow-x-auto gap-3 pb-1 scrollbar-none">
             {BRANDS.map(b => {
-              const isActive = searchParams.make?.toLowerCase() === b.name.toLowerCase()
-                || searchParams.make === 'Mercedes Benz' && b.slug === 'mercedes-benz';
+              const isActive = searchParams.make === b.make;
               const sp = new URLSearchParams(searchParams);
               sp.delete('page');
               if (isActive) sp.delete('make');
-              else sp.set('make', b.name === 'Mercedes-Benz' ? 'Mercedes Benz' : b.name);
-              const href = `${basePath}?${sp.toString()}`;
+              else sp.set('make', b.make);
+              const href = isActive ? `${basePath}?${sp.toString()}` : `/used/${b.slug}`;
               return (
                 <Link
                   key={b.slug}

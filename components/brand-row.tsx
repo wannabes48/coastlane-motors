@@ -1,28 +1,29 @@
-import Link from 'next/link';
+import { LogoMarquee } from '@/components/ui/logo-marquee';
 
 const BRANDS = [
-  { name: 'Toyota', logo: '/Toyota-Logo.png', url: '/used?make=Toyota' },
-  { name: 'Nissan', logo: '/Nissan-logo.png', url: '/used?make=Nissan' },
-  { name: 'Mazda', logo: '/Mazda-Logo.png', url: '/used?make=Mazda' },
-  { name: 'Subaru', logo: '/Subaru-Logo.png', url: '/used?make=Subaru' },
-  { name: 'Mitsubishi', logo: '/Mitsubishi-Logo.png', url: '/used?make=Mitsubishi' },
-  { name: 'Honda', logo: '/Honda-Logo.png', url: '/used?make=Honda' },
-  { name: 'Isuzu', logo: '/Isuzu-Logo.png', url: '/used?make=Isuzu' },
-  { name: 'Mercedes-Benz', logo: '/Mercedes-Logo.png', url: '/used?make=Mercedes Benz' }
+  { alt: 'Toyota',        src: '/Toyota-Logo.png',        href: '/used/toyota' },
+  { alt: 'Nissan',        src: '/Nissan-logo.png',        href: '/used/nissan' },
+  { alt: 'Mazda',         src: '/Mazda-Logo.png',         href: '/used/mazda' },
+  { alt: 'Subaru',        src: '/Subaru-Logo.png',        href: '/used/subaru' },
+  { alt: 'Mitsubishi',    src: '/Mitsubishi-Logo.png',    href: '/used/mitsubishi' },
+  { alt: 'Honda',         src: '/Honda-Logo.png',         href: '/used/honda' },
+  { alt: 'Isuzu',         src: '/Isuzu-Logo.png',         href: '/used/isuzu' },
+  { alt: 'Mercedes-Benz', src: '/Mercedes-Logo.png',      href: '/used/mercedes-benz' },
+  { alt: 'BMW',           src: '/BMW-Logo.png',           href: '/used/bmw' },
+  { alt: 'Audi',          src: '/Audi-Logo.png',          href: '/used/audi' },
+  { alt: 'Suzuki',        src: '/Suzuki-Logo.png',        href: '/used/suzuki' },
+  { alt: 'Lexus',         src: '/Lexus-Logo.png',         href: '/used/lexus' },
+  { alt: 'Volkswagen',    src: '/Volkswagen-Logo.png',    href: '/used/volkswagen' },
+  { alt: 'Ford',          src: '/Ford-Logo.png',          href: '/used/ford' },
 ];
 
 export function BrandRow() {
   return (
-    <div className="py-8 md:py-12 text-center bg-sky overflow-hidden">
-      <h2 className="text-slate text-sm font-semibold mb-6">Popular car brands</h2>
-      {/* Scrollable horizontally on mobile, fits in one line on desktop */}
-      <div className="flex flex-nowrap overflow-x-auto scrollbar-none justify-start lg:justify-center items-center gap-6 md:gap-8 lg:gap-12 px-4 max-w-7xl mx-auto pb-4">
-        {BRANDS.map(b => (
-          <Link key={b.url} href={b.url} className="shrink-0 flex items-center justify-center">
-            <img src={b.logo} alt={b.name} className="w-16 md:w-20 lg:w-[100px] h-16 md:h-20 lg:h-[100px] object-contain" />
-          </Link>
-        ))}
-      </div>
+    <div className="py-8 md:py-10 bg-sky">
+      <h2 className="text-center font-sans text-[11px] font-semibold tracking-[3px] uppercase text-slate mb-5">
+        Popular car brands
+      </h2>
+      <LogoMarquee logos={BRANDS} />
     </div>
   );
 }

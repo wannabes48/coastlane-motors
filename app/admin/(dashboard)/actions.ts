@@ -1,60 +1,18 @@
+// app/admin/(dashboard)/actions.ts
+// Full replacement — multi-admin, activity log, per-listing WhatsApp stamping.
+
 'use server';
+
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
+import { redirect }       from 'next/navigation';
 import { v2 as cloudinary } from 'cloudinary';
+
 import { supabaseServer } from '@/lib/supabase/server';
-import { supabaseAdmin } from '@/lib/supabase/admin';
-import { vehicleSchema } from '@/lib/schema';
-import { buildSlug } from '@/lib/slug';
-
-export async function saveVehicle(id: string, raw: unknown) {
-  const parsed = vehicleSchema.safeParse(raw);
-  if (!parsed.success) return { ok: false, errors: parsed.error.flatten() };
-
-  const supabase = await supabaseServer();
-  const payload = { ...parsed.data, images: parsed.data.images.sort((a,b)=>a.position-b.position) };
-
-  const { data: existing } = await supabase.from('vehicles').select('id').eq('id', id).maybeSingle();
-
-  if (existing) {
-    const { error } = await supabase.from('vehicles').update(payload).eq('id', id);
-    if (error) return { ok: false, message: error.message };
-  } else {
-    const { error } = await supabase.from('vehicles')
-      .insert({ id, ...payload, slug: buildSlug(parsed.data) });
-    if (error) return { ok: false, message: error.message };
-  }
-
-  revalidatePath('/'); revalidatePath('/used'); revalidatePath('/new'); revalidatePath('/admin');
-  redirect('/admin');
-}
-
-export async function setFeatured(id: string, featured: boolean) {
-  const supabase = await supabaseServer();
-
-  // Only one car should be featured at a time.
-  // If we're featuring a new one, unfeature all others first.
-  if (featured) {
-    const { error: clearError } = await supabase
-      .from('vehicles')
-      .update({ featured: false })
-      .eq('featured', true)
-      .neq('id', id);                    // keep this one out of the clear
-
-    if (clearError) return { ok: false, message: clearError.message };
-  }
-
-  const { error } = await supabase
-    .from('vehicles')
-    .update({ featured })
-    .eq('id', id);
-
-  if (error) return { ok: false, message: error.message };
-
-  revalidatePath('/');                   // home page (StaffPick)
-  revalidatePath('/admin');              // dashboard table
-  return { ok: true };
-}
+import { supabaseAdmin }  from '@/lib/supabase/admin';
+import { vehicleSchema }  from '@/lib/schema';
+import { buildSlug }      from '@/lib/slug';
+import { logActivity, buildDiff, type ActivityAction } from '@/lib/activity';
+import { resolveAdminWhatsapp } from '@/lib/whatsapp';
 
 cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
@@ -62,63 +20,201 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+// ── helpers ───────────────────────────────────────────────────────────────────
+
+async function requireAdmin() {
+  const supabase = await supabaseServer();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const { data: adminRow } = await supabaseAdmin
+    .from('admin_users')
+    .select('user_id, display_name, whatsapp, role')
+    .eq('user_id', user.id)
+    .maybeSingle();
+
+  if (!adminRow) throw new Error('Not an admin');
+  return adminRow;
+}
+
+function vehicleName(data: { year: number; make: string; model: string }) {
+  return `${data.year} ${data.make} ${data.model}`;
+}
+
+// ── saveVehicle ───────────────────────────────────────────────────────────────
+
+export async function saveVehicle(
+  id: string | null,
+  raw: unknown,
+): Promise<{ ok: boolean; errors?: unknown; message?: string }> {
+
+  const parsed = vehicleSchema.safeParse(raw);
+  if (!parsed.success) return { ok: false, errors: parsed.error.flatten() };
+
+  let admin;
+  try { admin = await requireAdmin(); }
+  catch (e: any) { return { ok: false, message: e.message }; }
+
+  const payload = {
+    ...parsed.data,
+    images:    parsed.data.images.sort((a, b) => a.position - b.position),
+    updated_by: admin.user_id,
+    // stamp the poster's WhatsApp so inquiries go directly to them
+    contact_whatsapp: resolveAdminWhatsapp(admin.whatsapp),
+  };
+
+  if (id) {
+    // ── UPDATE ────────────────────────────────────────────────────────────────
+    const { data: oldRow } = await supabaseAdmin
+      .from('vehicles')
+      .select('*')
+      .eq('id', id)
+      .maybeSingle();
+
+    if (!oldRow) return { ok: false, message: 'Vehicle not found.' };
+
+    const { error } = await supabaseAdmin
+      .from('vehicles')
+      .update(payload)
+      .eq('id', id);
+
+    if (error) return { ok: false, message: error.message };
+
+    // determine the most meaningful action label
+    let action: ActivityAction = 'updated';
+    if (payload.status === 'published' && oldRow.status !== 'published') action = 'published';
+    if (payload.status === 'draft'     && oldRow.status === 'published') action = 'unpublished';
+    if (payload.status === 'sold'      && oldRow.status !== 'sold')      action = 'sold';
+
+    await logActivity({
+      adminId:     admin.user_id,
+      vehicleId:   id,
+      vehicleSlug: oldRow.slug,
+      vehicleName: vehicleName(payload),
+      action,
+      diff: buildDiff(oldRow, payload),
+    });
+
+  } else {
+    // ── CREATE ────────────────────────────────────────────────────────────────
+    const slug = buildSlug(parsed.data);
+    const { data: newRow, error } = await supabaseAdmin
+      .from('vehicles')
+      .insert({
+        ...payload,
+        slug,
+        created_by: admin.user_id,
+      })
+      .select('id')
+      .single();
+
+    if (error) return { ok: false, message: error.message };
+
+    await logActivity({
+      adminId:     admin.user_id,
+      vehicleId:   newRow.id,
+      vehicleSlug: slug,
+      vehicleName: vehicleName(payload),
+      action:      'created',
+    });
+  }
+
+  revalidatePath('/');
+  revalidatePath('/used');
+  revalidatePath('/new');
+  revalidatePath('/admin');
+  redirect('/admin');
+}
+
+// ── setFeatured ───────────────────────────────────────────────────────────────
+
+export async function setFeatured(
+  id: string,
+  featured: boolean,
+): Promise<{ ok: boolean; message?: string }> {
+
+  let admin;
+  try { admin = await requireAdmin(); }
+  catch (e: any) { return { ok: false, message: e.message }; }
+
+  if (featured) {
+    await supabaseAdmin
+      .from('vehicles')
+      .update({ featured: false })
+      .eq('featured', true)
+      .neq('id', id);
+  }
+
+  const { data: row } = await supabaseAdmin
+    .from('vehicles')
+    .select('slug, make, model, year')
+    .eq('id', id)
+    .maybeSingle();
+
+  const { error } = await supabaseAdmin
+    .from('vehicles')
+    .update({ featured, updated_by: admin.user_id })
+    .eq('id', id);
+
+  if (error) return { ok: false, message: error.message };
+
+  if (row) {
+    await logActivity({
+      adminId:     admin.user_id,
+      vehicleId:   id,
+      vehicleSlug: row.slug,
+      vehicleName: vehicleName(row),
+      action:      featured ? 'featured' : 'unfeatured',
+    });
+  }
+
+  revalidatePath('/');
+  revalidatePath('/admin');
+  return { ok: true };
+}
+
+// ── deleteVehicle ─────────────────────────────────────────────────────────────
+
 export async function deleteVehicle(
   id: string,
 ): Promise<{ ok: boolean; message?: string }> {
 
-  // 1. auth check — confirm the caller is an admin via RLS
-  const supabase = await supabaseServer();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { ok: false, message: 'Not authenticated.' };
+  let admin;
+  try { admin = await requireAdmin(); }
+  catch (e: any) { return { ok: false, message: e.message }; }
 
-  // 2. fetch the vehicle (need the images list and slug for cleanup)
-  const { data: vehicle, error: fetchError } = await supabaseAdmin
+  const { data: vehicle } = await supabaseAdmin
     .from('vehicles')
-    .select('id, slug, images')
+    .select('id, slug, make, model, year')
     .eq('id', id)
     .maybeSingle();
 
-  if (fetchError || !vehicle) {
-    return { ok: false, message: 'Vehicle not found.' };
-  }
+  if (!vehicle) return { ok: false, message: 'Vehicle not found.' };
 
-  // 3. delete Cloudinary images
-  //    Strategy A: delete by folder prefix (cleanest — removes everything in the folder)
-  //    Strategy B: delete by public_id list (safer if the folder contains other assets)
-  //    We use A since uploads go to coastlane/vehicles/{id}/ and nowhere else.
+  // log BEFORE delete so the vehicle_id FK is still valid
+  await logActivity({
+    adminId:     admin.user_id,
+    vehicleId:   id,
+    vehicleSlug: vehicle.slug,
+    vehicleName: vehicleName(vehicle),
+    action:      'deleted',
+  });
+
+  // Cloudinary cleanup (non-fatal)
   try {
-    await cloudinary.api.delete_resources_by_prefix(
-      `coastlane/vehicles/${vehicle.id}`,
-    );
-    // delete the now-empty folder
-    await cloudinary.api.delete_folder(
-      `coastlane/vehicles/${vehicle.id}`,
-    ).catch(() => {
-      // folder may not exist if no images were ever uploaded — ignore
-    });
+    await cloudinary.api.delete_resources_by_prefix(`coastlane/vehicles/${id}`);
+    await cloudinary.api.delete_folder(`coastlane/vehicles/${id}`).catch(() => {});
   } catch (err: any) {
-    // Cloudinary errors should not block the DB delete.
-    // Log and continue — orphaned images are harmless vs. a broken UI.
     console.error('[deleteVehicle] Cloudinary cleanup failed:', err?.message);
   }
 
-  // 4. delete the database row (use service role to bypass RLS for the delete)
-  const { error: deleteError } = await supabaseAdmin
-    .from('vehicles')
-    .delete()
-    .eq('id', id);
+  const { error } = await supabaseAdmin.from('vehicles').delete().eq('id', id);
+  if (error) return { ok: false, message: error.message };
 
-  if (deleteError) {
-    return { ok: false, message: deleteError.message };
-  }
-
-  // 5. revalidate all pages that could show this vehicle
   revalidatePath('/');
   revalidatePath('/used');
   revalidatePath('/new');
   revalidatePath(`/cars/${vehicle.slug}`);
   revalidatePath('/admin');
-
-  // 6. redirect back to the dashboard
   redirect('/admin');
 }

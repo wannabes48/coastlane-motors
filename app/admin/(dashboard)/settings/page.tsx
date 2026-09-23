@@ -36,7 +36,7 @@ export default function SettingsPage() {
           Your WhatsApp number
         </label>
         <div className="flex gap-3">
-          <div className="flex items-center gap-2 flex-1 h-11 px-3
+          <div className="flex items-center gap-2 flex-1 min-w-0 h-11 px-3
                           border border-[#E2E8F0] rounded-lg bg-white
                           focus-within:border-[#1565C0]">
             <Phone size={15} aria-hidden="true" className="text-[#1565C0] shrink-0" />
@@ -45,7 +45,7 @@ export default function SettingsPage() {
               value={value}
               onChange={e => setValue(e.target.value)}
               placeholder="254712345678"
-              className="flex-1 font-[Poppins] text-[13px] text-[#0F1923]
+              className="flex-1 min-w-0 w-full font-[Poppins] text-[13px] text-[#0F1923]
                          placeholder-[#94A3B8] focus:outline-none bg-transparent"
             />
           </div>
@@ -53,7 +53,7 @@ export default function SettingsPage() {
             type="button"
             onClick={handleSave}
             disabled={pending || !value}
-            className="h-11 px-5 bg-[#1565C0] hover:bg-[#0D47A1] rounded-lg
+            className="h-11 px-3 sm:px-5 shrink-0 bg-[#1565C0] hover:bg-[#0D47A1] rounded-lg
                        font-[Poppins] text-[13px] font-semibold text-white
                        transition-colors disabled:opacity-50 flex items-center gap-2"
           >

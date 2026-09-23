@@ -12,6 +12,11 @@ export const metadata: Metadata = {
   openGraph: { type: 'website', locale: 'en_KE', siteName: 'Coastlane Motors' },
   robots: { index: true, follow: true },
   alternates: { canonical: '/' },
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' }
+    ]
+  }
 };
 
 export const viewport: Viewport = {

@@ -7,7 +7,7 @@ import { ShareButton } from '@/components/share-button';
 import { fmtKES } from '@/lib/money';
 import { waLink } from '@/lib/whatsapp';
 import { Metadata } from 'next';
-import { Phone, Eye, Gauge, Settings2, MapPin, ArrowRight } from 'lucide-react';
+import { Phone, Eye, Gauge, MapPin, ArrowRight, Cog, Fuel, Engine, Paintbrush } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ViewCounter } from './view-counter';
@@ -218,7 +218,7 @@ export default async function CarDetail({ params }: { params: Promise<{ slug: st
                 {car.transmission && (
                   <div>
                     <div className="flex items-center gap-1 text-[10px] text-slate uppercase tracking-[1.5px] mb-0.5">
-                      <Settings2 size={11} className="text-azure" aria-hidden="true" /> Trans.
+                      <Cog size={11} className="text-azure" aria-hidden="true" /> Trans.
                     </div>
                     <div className="font-sans text-[13px] font-semibold text-ink">{car.transmission}</div>
                   </div>
@@ -234,7 +234,7 @@ export default async function CarDetail({ params }: { params: Promise<{ slug: st
                 {car.fuel && (
                   <div>
                     <div className="flex items-center gap-1 text-[10px] text-slate uppercase tracking-[1.5px] mb-0.5">
-                      <div className="w-2.5 h-2.5 rounded-full border-[2px] border-azure" aria-hidden="true" /> Fuel
+                      <Fuel size={11} className="text-azure" aria-hidden="true" /> Fuel
                     </div>
                     <div className="font-sans text-[13px] font-semibold text-ink">{car.fuel}</div>
                   </div>
@@ -242,7 +242,7 @@ export default async function CarDetail({ params }: { params: Promise<{ slug: st
                 {car.engine_cc && (
                   <div>
                     <div className="flex items-center gap-1 text-[10px] text-slate uppercase tracking-[1.5px] mb-0.5">
-                      <div className="w-2.5 h-2.5 rounded-sm border-[2px] border-azure" aria-hidden="true" /> Engine
+                      <Engine size={11} className="text-azure" aria-hidden="true" /> Engine
                     </div>
                     <div className="font-sans text-[13px] font-semibold text-ink">{car.engine_cc} CC</div>
                   </div>
@@ -250,7 +250,7 @@ export default async function CarDetail({ params }: { params: Promise<{ slug: st
                 {car.exterior && (
                   <div>
                     <div className="flex items-center gap-1 text-[10px] text-slate uppercase tracking-[1.5px] mb-0.5">
-                      <div className="w-2.5 h-2.5 rounded border-[2px] border-azure" aria-hidden="true" /> Color
+                      <Paintbrush size={11} className="text-azure" aria-hidden="true" /> Color
                     </div>
                     <div className="font-sans text-[13px] font-semibold text-ink">{car.exterior}</div>
                   </div>

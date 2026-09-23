@@ -31,38 +31,44 @@ export default function SettingsPage() {
       </p>
 
       <div className="bg-white border border-[#E2E8F0] rounded-xl p-5">
-        <label className="block font-[Poppins] text-[12px] font-semibold
-                          text-[#64748B] uppercase tracking-wide mb-2">
+        <label className="block font-[Poppins] text-[12px] font-semibold text-[#64748B] uppercase tracking-wide mb-2">
           Your WhatsApp number
         </label>
-        <div className="flex gap-3">
-          <div className="flex items-center gap-2 flex-1 min-w-0 h-11 px-3
-                          border border-[#E2E8F0] rounded-lg bg-white
-                          focus-within:border-[#1565C0]">
+        <div className="flex gap-2 sm:gap-3">
+          {/* ADDED min-w-0 to the wrapper */}
+          <div className="flex items-center gap-2 flex-1 min-w-0 h-11 px-2 sm:px-3 border border-[#E2E8F0] rounded-lg bg-white focus-within:border-[#1565C0]">
             <Phone size={15} aria-hidden="true" className="text-[#1565C0] shrink-0" />
+            
+            {/* ADDED min-w-0 and w-full to the input */}
             <input
               type="tel"
               value={value}
               onChange={e => setValue(e.target.value)}
               placeholder="254712345678"
-              className="flex-1 min-w-0 w-full font-[Poppins] text-[13px] text-[#0F1923]
-                         placeholder-[#94A3B8] focus:outline-none bg-transparent"
+              className="flex-1 min-w-0 w-full font-[Poppins] text-[13px] text-[#0F1923] placeholder-[#94A3B8] focus:outline-none bg-transparent"
             />
           </div>
+          
+          {/* REDUCED mobile padding (px-3) and restored on larger screens (sm:px-5) */}
           <button
             type="button"
             onClick={handleSave}
             disabled={pending || !value}
-            className="h-11 px-3 sm:px-5 shrink-0 bg-[#1565C0] hover:bg-[#0D47A1] rounded-lg
-                       font-[Poppins] text-[13px] font-semibold text-white
-                       transition-colors disabled:opacity-50 flex items-center gap-2"
+            className="h-11 px-3 sm:px-5 shrink-0 bg-[#1565C0] hover:bg-[#0D47A1] rounded-lg font-[Poppins] text-[13px] font-semibold text-white transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
           >
-            {pending
-              ? <Loader2 size={14} className="animate-spin" aria-hidden="true" />
-              : saved
-              ? <Check size={14} aria-hidden="true" />
-              : null}
-            {saved ? 'Saved' : 'Save'}
+            {pending ? (
+              <Loader2 size={14} className="animate-spin" aria-hidden="true" />
+            ) : saved ? (
+              <Check size={14} aria-hidden="true" />
+            ) : null}
+            
+            {/* OPTIONAL: Hide text on tiny screens, show only icon */}
+            <span className="hidden sm:inline">
+              {saved ? 'Saved' : 'Save'}
+            </span>
+            <span className="sm:hidden">
+              {saved ? 'Saved' : 'Save'}
+            </span>
           </button>
         </div>
         <p className="font-[Poppins] text-[11px] text-[#94A3B8] mt-2">

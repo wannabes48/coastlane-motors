@@ -8,6 +8,7 @@ import { supabaseServer } from '@/lib/supabase/server';
 import { supabaseAdmin }  from '@/lib/supabase/admin';
 import { AdminSidebar }   from '@/components/admin/admin-sidebar';
 import { AdminBottomNav } from '@/components/admin/admin-bottom-nav';
+import { Toaster } from 'sonner';
 
 export default async function AdminLayout({
   children,
@@ -67,6 +68,7 @@ export default async function AdminLayout({
 
       {/* ── mobile bottom tab bar ── */}
       <AdminBottomNav isOwner={isOwner} />
+      <Toaster position="bottom-right" richColors />
     </div>
   );
 }

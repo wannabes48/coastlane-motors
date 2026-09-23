@@ -5,10 +5,13 @@ import { vehicleSchema } from '@/lib/schema';
 import { saveVehicle } from '@/app/admin/(dashboard)/actions';
 import { ImageUploader } from './image-uploader';
 import { useState } from 'react';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 export function CarForm({ initialData = null }: { initialData?: any }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const router = useRouter();
   
   // Stable ID for new vehicles
   const [vehicleId] = useState(() => initialData?.id || crypto.randomUUID());
@@ -36,6 +39,9 @@ export function CarForm({ initialData = null }: { initialData?: any }) {
     if (!res?.ok) {
       setError(res?.message || 'Failed to save vehicle');
       setSaving(false);
+    } else {
+      toast.success('Vehicle saved successfully!');
+      router.push('/admin');
     }
   };
 

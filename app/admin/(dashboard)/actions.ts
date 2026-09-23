@@ -1,7 +1,7 @@
+'use server';
+
 // app/admin/(dashboard)/actions.ts
 // Full replacement — multi-admin, activity log, per-listing WhatsApp stamping.
-
-'use server';
 
 import { revalidatePath } from 'next/cache';
 import { redirect }       from 'next/navigation';
@@ -63,16 +63,13 @@ export async function saveVehicle(
     contact_whatsapp: resolveAdminWhatsapp(admin.whatsapp),
   };
 
-  if (id) {
+  // First, check if vehicle exists if an ID was provided
+  const { data: oldRow } = id
+    ? await supabaseAdmin.from('vehicles').select('*').eq('id', id).maybeSingle()
+    : { data: null };
+
+  if (oldRow) {
     // ── UPDATE ────────────────────────────────────────────────────────────────
-    const { data: oldRow } = await supabaseAdmin
-      .from('vehicles')
-      .select('*')
-      .eq('id', id)
-      .maybeSingle();
-
-    if (!oldRow) return { ok: false, message: 'Vehicle not found.' };
-
     const { error } = await supabaseAdmin
       .from('vehicles')
       .update(payload)
@@ -88,7 +85,7 @@ export async function saveVehicle(
 
     await logActivity({
       adminId:     admin.user_id,
-      vehicleId:   id,
+      vehicleId:   id!,
       vehicleSlug: oldRow.slug,
       vehicleName: vehicleName(payload),
       action,
@@ -98,13 +95,20 @@ export async function saveVehicle(
   } else {
     // ── CREATE ────────────────────────────────────────────────────────────────
     const slug = buildSlug(parsed.data);
+    
+    // We MUST use the provided id if available, because the client uses it for Cloudinary uploads
+    const insertPayload = {
+      ...payload,
+      slug,
+      created_by: admin.user_id,
+    };
+    if (id) {
+      (insertPayload as any).id = id;
+    }
+
     const { data: newRow, error } = await supabaseAdmin
       .from('vehicles')
-      .insert({
-        ...payload,
-        slug,
-        created_by: admin.user_id,
-      })
+      .insert(insertPayload)
       .select('id')
       .single();
 
@@ -123,7 +127,7 @@ export async function saveVehicle(
   revalidatePath('/used');
   revalidatePath('/new');
   revalidatePath('/admin');
-  redirect('/admin');
+  return { ok: true };
 }
 
 // ── setFeatured ───────────────────────────────────────────────────────────────

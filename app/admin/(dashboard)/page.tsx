@@ -17,9 +17,11 @@ type SortField = 'updated_at' | 'views' | 'price_kes' | 'created_at';
 export default async function AdminDashboard({
   searchParams,
 }: {
-  searchParams: Promise<{ sort?: SortField; status?: string; q?: string }>;
+  searchParams: Promise<{ sort?: SortField; status?: string; q?: string; page?: string }>;
 }) {
-  const { sort = 'updated_at', status, q } = await searchParams;
+  const { sort = 'updated_at', status, q, page = '1' } = await searchParams;
+  const currentPage = parseInt(page, 10) || 1;
+  const PAGE_SIZE = 10;
 
   // get current admin for context
   const supabase = await supabaseServer();
@@ -53,13 +55,16 @@ export default async function AdminDashboard({
       status, featured, views, updated_at,
       created_by_name, created_by_color,
       updated_by_name, updated_by_color
-    `);
+    `, { count: 'exact' });
 
   if (status) query = query.eq('status', status);
   if (q)      query = query.ilike('search_text', `%${q.toLowerCase()}%`);
   query = query.order(sort, { ascending: sort === 'price_kes' });
+  
+  query = query.range((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE - 1);
 
-  const { data: vehicles } = await query;
+  const { data: vehicles, count: totalVehicles } = await query;
+  const totalPages = Math.ceil((totalVehicles || 0) / PAGE_SIZE);
 
   const STATUS_COLOURS: Record<string, string> = {
     published: 'bg-[#ECFDF5] text-[#065F46]',
@@ -71,6 +76,15 @@ export default async function AdminDashboard({
     const p = new URLSearchParams({ sort: field });
     if (status) p.set('status', status);
     if (q) p.set('q', q);
+    return `?${p.toString()}`;
+  }
+
+  function pageLink(pNum: number) {
+    const p = new URLSearchParams();
+    if (sort !== 'updated_at') p.set('sort', sort);
+    if (status) p.set('status', status);
+    if (q) p.set('q', q);
+    if (pNum > 1) p.set('page', pNum.toString());
     return `?${p.toString()}`;
   }
 
@@ -205,8 +219,8 @@ export default async function AdminDashboard({
               <col style={{ width: '8%' }}  />
               <col style={{ width: '9%' }}  />
               <col style={{ width: '8%' }}  />
-              <col style={{ width: '16%' }} /> 
-              <col style={{ width: '16%' }} /> 
+              <col style={{ width: '16%' }} />
+              <col style={{ width: '16%' }} />
               <col style={{ width: '10%' }} />
             </colgroup>
             <thead>
@@ -351,6 +365,32 @@ export default async function AdminDashboard({
           </table>
         </div>
       </div>
+
+      {/* ── pagination ── */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
+          <p className="font-[Poppins] text-[12px] text-[#64748B]">
+            Showing {(currentPage - 1) * PAGE_SIZE + 1} to {Math.min(currentPage * PAGE_SIZE, totalVehicles || 0)} of {totalVehicles} cars
+          </p>
+          <div className="flex gap-2">
+            <Link 
+              href={currentPage > 1 ? pageLink(currentPage - 1) : '#'}
+              className={`h-9 px-3 flex items-center justify-center border border-[#E2E8F0] rounded-lg font-[Poppins] text-[12px] font-medium transition-colors ${currentPage <= 1 ? 'opacity-50 cursor-not-allowed text-[#94A3B8] pointer-events-none' : 'text-[#0F1923] hover:border-[#1565C0]'}`}
+            >
+              Previous
+            </Link>
+            <div className="flex items-center px-1 font-[Poppins] text-[12px] text-[#0F1923]">
+              Page {currentPage} of {totalPages}
+            </div>
+            <Link 
+              href={currentPage < totalPages ? pageLink(currentPage + 1) : '#'}
+              className={`h-9 px-3 flex items-center justify-center border border-[#E2E8F0] rounded-lg font-[Poppins] text-[12px] font-medium transition-colors ${currentPage >= totalPages ? 'opacity-50 cursor-not-allowed text-[#94A3B8] pointer-events-none' : 'text-[#0F1923] hover:border-[#1565C0]'}`}
+            >
+              Next
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* ── activity log ── */}
       <ActivityLog limit={40} />

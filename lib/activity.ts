@@ -96,7 +96,7 @@ export async function getActivityLog(limit = 50): Promise<ActivityEntry[]> {
     return [];
   }
 
-  return (data ?? []) as ActivityEntry[];
+  return (data ?? []) as unknown as ActivityEntry[];
 }
 
 export async function getVehicleActivityLog(vehicleId: string): Promise<ActivityEntry[]> {
@@ -111,5 +111,5 @@ export async function getVehicleActivityLog(vehicleId: string): Promise<Activity
     .limit(30);
 
   if (error) return [];
-  return (data ?? []) as ActivityEntry[];
+  return (data ?? []) as unknown as ActivityEntry[];
 }

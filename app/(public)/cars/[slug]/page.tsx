@@ -35,11 +35,29 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     'Duty paid, clearly priced in KES. WhatsApp Coastlane Motors to arrange a viewing.',
   ].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
 
+  let ogImages: any[] = [];
+  if (car.images && car.images[0]) {
+    const imageUrl = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/c_fill,w_1200,h_630,f_jpg,q_80/${car.images[0].public_id}`;
+    ogImages = [
+      {
+        url: imageUrl,
+        width: 1200,
+        height: 630,
+        alt: title,
+      },
+    ];
+  }
+
   return {
     title,
     description,
     alternates: { canonical: `/cars/${car.slug}` },
-    openGraph: { type: 'website', title, images: [{ url: `/cars/${car.slug}/opengraph-image` }] },
+    openGraph: { 
+      type: 'website', 
+      title, 
+      description,
+      images: ogImages 
+    },
     robots: car.status === 'sold' ? { index: false, follow: true } : { index: true, follow: true },
   };
 }

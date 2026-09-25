@@ -117,7 +117,7 @@ export function CarForm({ initialData = null }: { initialData?: any }) {
               <option value="Van">Van</option>
               <option value="Bus">Bus</option>
               <option value="Coupe">Coupe</option>
-              <option value="Wagon">Station Wagon</option>
+              <option value="Station Wagon">Station Wagon</option>
             </select>
           </div>
           <div>

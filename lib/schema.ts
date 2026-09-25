@@ -20,7 +20,7 @@ export const vehicleSchema = z.object({
   fuel: z.enum(['Petrol', 'Diesel', 'Hybrid', 'Electric']).nullable(),
   engine_cc: z.coerce.number().int().positive().nullable(),
   drive: z.enum(['2WD', '4WD', 'AWD']).nullable(),
-  body_type: z.enum(['SUV','Sedan','Hatchback','Pickup','Van','Bus','Coupe','Wagon']).nullable(),
+  body_type: z.enum(['SUV','Sedan','Hatchback','Pickup','Van','Bus','Coupe','Station Wagon']).nullable(),
   exterior: z.string().optional(), interior: z.string().optional(),
   seats: z.coerce.number().int().min(1).max(60).nullable(),
   city: z.string().default('Mombasa'),

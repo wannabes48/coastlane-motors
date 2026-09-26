@@ -241,3 +241,36 @@ export async function getSimilarVehicles(
 
   return [...byBody, ...byPrice].slice(0, LIMIT);
 }
+
+// ─── Condition Counts ─────────────────────────────────────────────────────────
+
+export async function getConditionCounts(f: Omit<Filters, 'condition' | 'page'>) {
+  const supabase = await supabaseServer();
+
+  function buildBase() {
+    let q = supabase
+      .from('vehicles')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'published');
+
+    // apply every active filter except condition and page
+    if (f.q)            q = q.ilike('search_text', `%${f.q.toLowerCase()}%`);
+    if (f.make)         q = q.ilike('make', f.make);
+    if (f.city)         q = q.ilike('city', f.city);
+    if (f.body)         q = q.eq('body_type', f.body);
+    if (f.fuel)         q = q.eq('fuel', f.fuel);
+    if (f.transmission) q = q.eq('transmission', f.transmission);
+    if (f.min != null)  q = q.gte('price_kes', f.min);
+    if (f.max != null)  q = q.lte('price_kes', f.max);
+    if (f.yearFrom)     q = q.gte('year', f.yearFrom);
+
+    return q;
+  }
+
+  const [{ count: used }, { count: newCount }] = await Promise.all([
+    buildBase().eq('condition', 'used'),
+    buildBase().eq('condition', 'new'),
+  ]);
+
+  return { used: used ?? 0, new: newCount ?? 0 };
+}

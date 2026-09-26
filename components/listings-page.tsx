@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { listVehicles } from '@/lib/queries';
+import { listVehicles, getConditionCounts } from '@/lib/queries';
 import { CarCard }    from '@/components/car-card';
 import { FilterRail } from '@/components/filter-rail';
 import { Pagination } from '@/components/pagination';
@@ -37,8 +37,8 @@ export async function ListingsPage({
   const tab  = (searchParams.tab as 'used' | 'new') ?? defaultTab;
   const page = Math.max(1, Number(searchParams.page ?? 1));
 
-  const filters = {
-    condition:    tab,
+  // shared filter object — condition intentionally excluded
+  const sharedFilters = {
     q:            searchParams.q,
     make:         searchParams.make,
     city:         searchParams.city,
@@ -47,11 +47,14 @@ export async function ListingsPage({
     transmission: searchParams.transmission,
     min:          searchParams.min ? Number(searchParams.min) : undefined,
     max:          searchParams.max ? Number(searchParams.max) : undefined,
-    sort:         searchParams.sort as any,
-    page,
+    yearFrom:     searchParams.yearFrom ? Number(searchParams.yearFrom) : undefined,
   };
 
-  const { vehicles, total, pages } = await listVehicles(filters);
+  // both run in parallel — one DB round trip total
+  const [{ vehicles, total, pages }, counts] = await Promise.all([
+    listVehicles({ ...sharedFilters, condition: tab, sort: searchParams.sort as any, page }),
+    getConditionCounts(sharedFilters),
+  ]);
 
   function tabHref(condition: 'used' | 'new') {
     const sp = new URLSearchParams(searchParams);
@@ -100,16 +103,38 @@ export async function ListingsPage({
 
           {/* Condition tabs */}
           <div className="flex items-center gap-1 bg-slate/10 rounded-lg p-1 w-fit">
-            {(['used', 'new'] as const).map(cond => (
-              <Link
-                key={cond}
-                href={tabHref(cond)}
-                className={`h-8 px-5 rounded-md font-sans text-[13px] font-semibold transition-colors capitalize flex items-center
-                  ${tab === cond ? 'bg-white text-ink shadow-sm' : 'text-slate hover:text-ink'}`}
-              >
-                {cond === 'used' ? 'Used' : 'New'}
-              </Link>
-            ))}
+            {(['used', 'new'] as const).map((cond) => {
+              const count   = counts[cond];
+              const isActive = tab === cond;
+
+              return (
+                <Link
+                  key={cond}
+                  href={tabHref(cond)}
+                  aria-current={isActive ? 'page' : undefined}
+                  className={`h-8 px-5 rounded-md font-sans text-[13px] font-semibold transition-colors capitalize flex items-center gap-2
+                    ${isActive ? 'bg-white text-ink shadow-sm' : 'text-slate hover:text-ink'}`}
+                >
+                  {cond === 'used' ? 'Used' : 'New'}
+
+                  <span
+                    className={`inline-flex items-center justify-center
+                                min-w-[20px] h-5 px-1.5 rounded-full
+                                font-sans text-[10px] font-bold leading-none
+                                transition-colors
+                                ${isActive
+                                  ? 'bg-[#1565C0] text-white'
+                                  : count === 0
+                                  ? 'bg-slate/20 text-slate/60'
+                                  : 'bg-[#CBD5E1] text-[#64748B]'
+                                }`}
+                    aria-label={`${count} ${cond} car${count !== 1 ? 's' : ''} match current filters`}
+                  >
+                    {count}
+                  </span>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </div>

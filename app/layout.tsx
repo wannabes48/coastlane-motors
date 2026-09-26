@@ -25,7 +25,10 @@ export const viewport: Viewport = {
   viewportFit: 'cover',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+import { getConditionCounts } from '@/lib/queries';
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const counts = await getConditionCounts({}).catch(() => ({ used: 0, new: 0 }));
   const jsonLd = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -98,7 +101,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </Script>
       </head>
       <body className="antialiased min-h-screen flex flex-col">
-        <Nav />
+        <Nav counts={counts} />
         
         <main className="flex-1 flex flex-col pt-14">
           {children}

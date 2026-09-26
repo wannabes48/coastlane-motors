@@ -7,13 +7,17 @@ import { Menu, X, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
 
 const NAV_LINKS = [
-  { label: 'Used Cars', href: '/used', desc: 'Browse used stock' },
-  { label: 'New Cars',  href: '/new',  desc: 'Brand new vehicles' },
-  { label: 'About',     href: '/about', desc: 'Our story' },
-  { label: 'Contact',   href: '/contact', desc: 'Get in touch' },
+  { label: 'Used Cars', href: '/used', desc: 'Browse used stock', key: 'used' },
+  { label: 'New Cars',  href: '/new',  desc: 'Brand new vehicles', key: 'new' },
+  { label: 'About',     href: '/about', desc: 'Our story', key: 'about' },
+  { label: 'Contact',   href: '/contact', desc: 'Get in touch', key: 'contact' },
 ];
 
-export function Nav() {
+type NavProps = {
+  counts?: { used: number; new: number };
+};
+
+export function Nav({ counts }: NavProps = {}) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const waLink = `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP}`;
@@ -32,19 +36,27 @@ export function Nav() {
         <div className="flex items-center gap-2">
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-1 mr-4">
-            {NAV_LINKS.map(link => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`h-9 px-4 rounded-lg font-sans text-[14px] font-medium flex items-center transition-colors
-                  ${isActive(link.href)
-                    ? 'bg-white/10 text-white'
-                    : 'text-white/75 hover:text-white hover:bg-white/5'
-                  }`}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {NAV_LINKS.map(link => {
+              const count = link.key === 'used' ? counts?.used : link.key === 'new' ? counts?.new : undefined;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`h-9 px-4 rounded-lg font-sans text-[14px] font-medium flex items-center transition-colors
+                    ${isActive(link.href)
+                      ? 'bg-white/10 text-white'
+                      : 'text-white/75 hover:text-white hover:bg-white/5'
+                    }`}
+                >
+                  {link.label}
+                  {count !== undefined && (
+                    <span className="ml-1.5 text-[10px] font-bold text-[#1565C0] bg-white px-1.5 py-0.5 rounded-full">
+                      {count}
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
           </nav>
 
           {/* WhatsApp CTA */}
@@ -82,23 +94,31 @@ export function Nav() {
             className="md:hidden absolute top-full left-0 right-0 z-40 bg-ink border-t border-white/10 shadow-2xl"
             style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
           >
-            {NAV_LINKS.map(link => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setOpen(false)}
-                className={`flex items-center justify-between px-5 py-4 border-b border-white/5 active:bg-white/10 transition-colors
-                  ${isActive(link.href) ? 'bg-white/10' : ''}`}
-              >
-                <div>
-                  <p className={`font-sans font-semibold text-[15px] ${isActive(link.href) ? 'text-white' : 'text-white/90'}`}>
-                    {link.label}
-                  </p>
-                  <p className="font-sans text-[12px] text-white/50 mt-0.5">{link.desc}</p>
-                </div>
-                <ChevronRight size={16} className="text-white/40 shrink-0" aria-hidden="true" />
-              </Link>
-            ))}
+            {NAV_LINKS.map(link => {
+              const count = link.key === 'used' ? counts?.used : link.key === 'new' ? counts?.new : undefined;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setOpen(false)}
+                  className={`flex items-center justify-between px-5 py-4 border-b border-white/5 active:bg-white/10 transition-colors
+                    ${isActive(link.href) ? 'bg-white/10' : ''}`}
+                >
+                  <div>
+                    <p className={`font-sans font-semibold text-[15px] flex items-center ${isActive(link.href) ? 'text-white' : 'text-white/90'}`}>
+                      {link.label}
+                      {count !== undefined && (
+                        <span className="ml-2 text-[10px] font-bold text-[#1565C0] bg-white px-1.5 py-0.5 rounded-full">
+                          {count}
+                        </span>
+                      )}
+                    </p>
+                    <p className="font-sans text-[12px] text-white/50 mt-0.5">{link.desc}</p>
+                  </div>
+                  <ChevronRight size={16} className="text-white/40 shrink-0" aria-hidden="true" />
+                </Link>
+              );
+            })}
 
             {/* WhatsApp row at bottom */}
             <a

@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { Logo } from '@/components/logo';
 import { Nav } from '@/components/nav';
 import { CookieBanner } from '@/components/cookie-banner';
+import { WhatsAppFAB }   from '@/components/whatsapp-fab';
+
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
   title: { default: 'Coastlane Motors — Used & New Cars for Sale in Kenya', template: '%s | Coastlane Motors' },
@@ -141,6 +143,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <p>&copy; {new Date().getFullYear()} Coastlane Motors. All rights reserved.</p>
           </div>
         </footer>
+        <WhatsAppFAB />
         <CookieBanner />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       </body>

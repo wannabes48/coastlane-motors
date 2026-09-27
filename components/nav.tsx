@@ -59,17 +59,6 @@ export function Nav({ counts }: NavProps = {}) {
             })}
           </nav>
 
-          {/* WhatsApp CTA */}
-          <a
-            href={waLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 h-9 px-4 rounded-full bg-wa text-ink text-[13px] font-semibold hover:opacity-90 transition-opacity"
-          >
-            <Image src="/whatsapp-icon.png" alt="" width={16} height={16} className="object-contain" />
-            <span className="hidden sm:inline">WhatsApp</span>
-          </a>
-
           {/* Hamburger */}
           <button
             onClick={() => setOpen(o => !o)}

@@ -56,6 +56,13 @@ export default async function HomePage() {
       <Suspense fallback={<SectionSkeleton height={80} />}>
         <BrandRow />
       </Suspense>
+      
+
+      {/* ⑤ In-stock listings (Used + New tabs) */}
+      <Suspense fallback={<SectionSkeleton height={400} />}>
+        <InStock />
+      </Suspense>
+
       <Suspense fallback={<SectionSkeleton height={180} />}>
         <CategoryRail counts={counts} />
       </Suspense>
@@ -63,11 +70,6 @@ export default async function HomePage() {
       {/* ④ Stats band — social proof anchor */}
       <Suspense fallback={<SectionSkeleton height={120} />}>
         <StatsBand />
-      </Suspense>
-
-      {/* ⑤ In-stock listings (Used + New tabs) */}
-      <Suspense fallback={<SectionSkeleton height={400} />}>
-        <InStock />
       </Suspense>
 
       {/* ⑥ FAQ — featured snippets + FAQPage schema */}

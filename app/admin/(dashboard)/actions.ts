@@ -13,6 +13,8 @@ import { vehicleSchema }  from '@/lib/schema';
 import { buildSlug }      from '@/lib/slug';
 import { logActivity, buildDiff, type ActivityAction } from '@/lib/activity';
 import { resolveAdminWhatsapp } from '@/lib/whatsapp';
+import { bust, bustPattern }   from '@/lib/cache';
+import { CK }                  from '@/lib/cache-keys';
 
 cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
@@ -123,6 +125,20 @@ export async function saveVehicle(
     });
   }
 
+  // ── bust cache ──────────────────────────────────────────────────────────────
+  await Promise.all([
+    bustPattern('listings:*'),
+    bustPattern('condition-counts:*'),
+    bust(
+      CK.categoryCounts(),
+      CK.budgetCounts(),
+      CK.stats(),
+      CK.featured(),
+      CK.recentSold(4),
+    ),
+    oldRow ? bust(CK.vehicle(oldRow.slug)) : Promise.resolve(),
+  ]);
+
   revalidatePath('/');
   revalidatePath('/used');
   revalidatePath('/new');
@@ -172,6 +188,8 @@ export async function setFeatured(
     });
   }
 
+  await bust(CK.featured());
+
   revalidatePath('/');
   revalidatePath('/admin');
   return { ok: true };
@@ -214,6 +232,19 @@ export async function deleteVehicle(
 
   const { error } = await supabaseAdmin.from('vehicles').delete().eq('id', id);
   if (error) return { ok: false, message: error.message };
+
+  // ── bust cache ──────────────────────────────────────────────────────────────
+  await Promise.all([
+    bustPattern('listings:*'),
+    bustPattern('condition-counts:*'),
+    bust(
+      CK.vehicle(vehicle.slug),
+      CK.categoryCounts(),
+      CK.budgetCounts(),
+      CK.stats(),
+      CK.recentSold(4),
+    ),
+  ]);
 
   revalidatePath('/');
   revalidatePath('/used');

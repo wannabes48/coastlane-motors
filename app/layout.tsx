@@ -16,7 +16,8 @@ export const metadata: Metadata = {
   alternates: { canonical: '/' },
   icons: {
     icon: [
-      { url: '/icon.svg', type: 'image/svg+xml' }
+      { url: '/favicon.ico', sizes: '48x48' },
+      { url: '/icon.svg', type: 'image/svg+xml' },
     ]
   }
 };
@@ -27,10 +28,8 @@ export const viewport: Viewport = {
   viewportFit: 'cover',
 };
 
-import { getConditionCounts } from '@/lib/queries';
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const counts = await getConditionCounts({}).catch(() => ({ used: 0, new: 0 }));
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   const jsonLd = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -103,7 +102,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         </Script>
       </head>
       <body className="antialiased min-h-screen flex flex-col">
-        <Nav counts={counts} />
+        <Nav />
         
         <main className="flex-1 flex flex-col pt-14">
           {children}

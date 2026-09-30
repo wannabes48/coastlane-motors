@@ -1,4 +1,7 @@
 import { supabaseServer } from './supabase/server';
+import { cached }  from '@/lib/cache';
+import { CK }      from '@/lib/cache-keys';
+import { TTL }     from '@/lib/redis';
 
 export type Filters = {
   condition?: 'used' | 'new';
@@ -11,114 +14,154 @@ export type Filters = {
 
 const PAGE_SIZE = 12;
 
+// ─── listVehicles ─────────────────────────────────────────────────────────────
+
 export async function listVehicles(f: Filters) {
-  const supabase = await supabaseServer();
-  let q = supabase.from('vehicles')
-    .select('*', { count: 'exact' })
-    .in('status', ['published', 'sold']);
+  const key = CK.listings(f);
 
-  if (f.condition)    q = q.eq('condition', f.condition);
-  if (f.q)            q = q.ilike('search_text', `%${f.q.toLowerCase()}%`);
-  if (f.make)         q = q.ilike('make', f.make);
-  if (f.city)         q = q.ilike('city', f.city);
-  if (f.body)         q = q.eq('body_type', f.body);
-  if (f.fuel)         q = q.eq('fuel', f.fuel);
-  if (f.transmission) q = q.eq('transmission', f.transmission);
-  if (f.min != null)  q = q.gte('price_kes', f.min);
-  if (f.max != null)  q = q.lte('price_kes', f.max);
-  if (f.yearFrom)     q = q.gte('year', f.yearFrom);
+  return cached(key, async () => {
+    const supabase = await supabaseServer();
+    let q = supabase.from('vehicles')
+      .select('*', { count: 'exact' })
+      .in('status', ['published', 'sold']);
 
-  q = q.order('status', { ascending: true });        // published before sold
-  if (f.sort === 'price_asc')   q = q.order('price_kes', { ascending: true,  nullsFirst: false });
-  else if (f.sort === 'price_desc') q = q.order('price_kes', { ascending: false, nullsFirst: false });
-  else if (f.sort === 'mileage_asc') q = q.order('mileage_km', { ascending: true, nullsFirst: false });
-  else q = q.order('created_at', { ascending: false });
+    if (f.condition)    q = q.eq('condition', f.condition);
+    if (f.q)            q = q.ilike('search_text', `%${f.q.toLowerCase()}%`);
+    if (f.make)         q = q.ilike('make', f.make);
+    if (f.city)         q = q.ilike('city', f.city);
+    if (f.body)         q = q.eq('body_type', f.body);
+    if (f.fuel)         q = q.eq('fuel', f.fuel);
+    if (f.transmission) q = q.eq('transmission', f.transmission);
+    if (f.min != null)  q = q.gte('price_kes', f.min);
+    if (f.max != null)  q = q.lte('price_kes', f.max);
+    if (f.yearFrom)     q = q.gte('year', f.yearFrom);
 
-  const page = Math.max(1, f.page ?? 1);
-  const from = (page - 1) * PAGE_SIZE;
-  const to   = from + PAGE_SIZE - 1;
+    q = q.order('status', { ascending: true });        // published before sold
+    if (f.sort === 'price_asc')   q = q.order('price_kes', { ascending: true,  nullsFirst: false });
+    else if (f.sort === 'price_desc') q = q.order('price_kes', { ascending: false, nullsFirst: false });
+    else if (f.sort === 'mileage_asc') q = q.order('mileage_km', { ascending: true, nullsFirst: false });
+    else q = q.order('created_at', { ascending: false });
 
-  const { data, count, error } = await q.range(from, to);
-  if (error) throw error;
+    const page = Math.max(1, f.page ?? 1);
+    const from = (page - 1) * PAGE_SIZE;
+    const to   = from + PAGE_SIZE - 1;
 
-  return {
-    vehicles: data ?? [],
-    total:    count ?? 0,
-    page,
-    pages:    Math.ceil((count ?? 0) / PAGE_SIZE),
-  };
+    const { data, count, error } = await q.range(from, to);
+    if (error) throw error;
+
+    return {
+      vehicles: data ?? [],
+      total:    count ?? 0,
+      page,
+      pages:    Math.ceil((count ?? 0) / PAGE_SIZE),
+    };
+  }, TTL.listings);
 }
+
+// ─── getVehicle ───────────────────────────────────────────────────────────────
 
 export async function getVehicle(slug: string) {
-  const supabase = await supabaseServer();
-  const { data } = await supabase.from('vehicles').select('*').eq('slug', slug)
-    .in('status', ['published', 'sold']).maybeSingle();
-  return data;
+  return cached(
+    CK.vehicle(slug),
+    async () => {
+      const supabase = await supabaseServer();
+      const { data } = await supabase.from('vehicles').select('*').eq('slug', slug)
+        .in('status', ['published', 'sold']).maybeSingle();
+      return data;
+    },
+    TTL.vehicle,
+  );
 }
 
-export async function getCategoryCountsByCondition() {
-  const supabase = await supabaseServer();
-  const { data } = await supabase
-    .from('vehicles')
-    .select('body_type, condition')
-    .eq('status', 'published');
+// ─── getCategoryCountsByCondition ─────────────────────────────────────────────
 
-  const counts: Record<string, { used: number; new: number }> = {};
-  for (const row of data ?? []) {
-    if (!row.body_type) continue;
-    if (!counts[row.body_type]) counts[row.body_type] = { used: 0, new: 0 };
-    counts[row.body_type][row.condition as 'used' | 'new']++;
-  }
-  return counts;
+export async function getCategoryCountsByCondition() {
+  return cached(
+    CK.categoryCounts(),
+    async () => {
+      const supabase = await supabaseServer();
+      const { data } = await supabase
+        .from('vehicles')
+        .select('body_type, condition')
+        .eq('status', 'published');
+
+      const counts: Record<string, { used: number; new: number }> = {};
+      for (const row of data ?? []) {
+        if (!row.body_type) continue;
+        if (!counts[row.body_type]) counts[row.body_type] = { used: 0, new: 0 };
+        counts[row.body_type][row.condition as 'used' | 'new']++;
+      }
+      return counts;
+    },
+    TTL.counts,
+  );
 }
 
 // ─── StaffPick ────────────────────────────────────────────────────────────────
 
 export async function getFeaturedVehicle() {
-  const supabase = await supabaseServer();
-  const { data } = await supabase
-    .from('vehicles')
-    .select('*')
-    .eq('featured', true)
-    .eq('status', 'published')
-    .maybeSingle();
-  return data;
+  return cached(
+    CK.featured(),
+    async () => {
+      const supabase = await supabaseServer();
+      const { data } = await supabase
+        .from('vehicles')
+        .select('*')
+        .eq('featured', true)
+        .eq('status', 'published')
+        .maybeSingle();
+      return data;
+    },
+    TTL.featured,
+  );
 }
 
 // ─── StatsBand ────────────────────────────────────────────────────────────────
 
 export async function getStats() {
-  const supabase = await supabaseServer();
+  return cached(
+    CK.stats(),
+    async () => {
+      const supabase = await supabaseServer();
 
-  const [{ count: total }, { count: sold }] = await Promise.all([
-    supabase
-      .from('vehicles')
-      .select('*', { count: 'exact', head: true })
-      .eq('status', 'published'),
-    supabase
-      .from('vehicles')
-      .select('*', { count: 'exact', head: true })
-      .eq('status', 'sold'),
-  ]);
+      const [{ count: total }, { count: sold }] = await Promise.all([
+        supabase
+          .from('vehicles')
+          .select('*', { count: 'exact', head: true })
+          .eq('status', 'published'),
+        supabase
+          .from('vehicles')
+          .select('*', { count: 'exact', head: true })
+          .eq('status', 'sold'),
+      ]);
 
-  return {
-    total: total ?? 0,
-    sold: sold ?? 0,
-    years: new Date().getFullYear() - 2016, // update founding year
-  };
+      return {
+        total: total ?? 0,
+        sold: sold ?? 0,
+        years: new Date().getFullYear() - 2016,
+      };
+    },
+    TTL.stats,
+  );
 }
 
 // ─── RecentlySold ─────────────────────────────────────────────────────────────
 
 export async function getRecentlySold(limit = 4) {
-  const supabase = await supabaseServer();
-  const { data } = await supabase
-    .from('vehicles')
-    .select('id, slug, make, model, year, price_kes, images, condition')
-    .eq('status', 'sold')
-    .order('sold_at', { ascending: false })
-    .limit(limit);
-  return data ?? [];
+  return cached(
+    CK.recentSold(limit),
+    async () => {
+      const supabase = await supabaseServer();
+      const { data } = await supabase
+        .from('vehicles')
+        .select('id, slug, make, model, year, price_kes, images, condition')
+        .eq('status', 'sold')
+        .order('sold_at', { ascending: false })
+        .limit(limit);
+      return data ?? [];
+    },
+    TTL.recentSold,
+  );
 }
 
 // ─── BudgetFinder ─────────────────────────────────────────────────────────────
@@ -133,21 +176,27 @@ const BUCKETS: Bucket[] = [
 ];
 
 export async function getBudgetCounts(): Promise<(number | null)[]> {
-  const supabase = await supabaseServer();
+  return cached(
+    CK.budgetCounts(),
+    async () => {
+      const supabase = await supabaseServer();
 
-  const results = await Promise.all(
-    BUCKETS.map(({ min, max }) => {
-      let q = supabase
-        .from('vehicles')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'published');
-      if (min != null) q = q.gte('price_kes', min);
-      if (max != null) q = q.lt('price_kes', max);
-      return q;
-    }),
+      const results = await Promise.all(
+        BUCKETS.map(({ min, max }) => {
+          let q = supabase
+            .from('vehicles')
+            .select('*', { count: 'exact', head: true })
+            .eq('status', 'published');
+          if (min != null) q = q.gte('price_kes', min);
+          if (max != null) q = q.lt('price_kes', max);
+          return q;
+        }),
+      );
+
+      return results.map(({ count }) => count ?? null);
+    },
+    TTL.budgetCounts,
   );
-
-  return results.map(({ count }) => count ?? null);
 }
 
 // ─── Adjacent cars (prev / next by created_at) ────────────────────────────────
@@ -157,36 +206,42 @@ export async function getAdjacentVehicles(
   condition: 'used' | 'new',
   createdAt: string,
 ) {
-  const supabase = await supabaseServer();
+  return cached(
+    CK.adjacent(currentId, condition, createdAt),
+    async () => {
+      const supabase = await supabaseServer();
 
-  const cols = 'id, slug, make, model, year, price_kes, images, condition';
+      const cols = 'id, slug, make, model, year, price_kes, images, condition';
 
-  const [{ data: prevData }, { data: nextData }] = await Promise.all([
-    supabase
-      .from('vehicles')
-      .select(cols)
-      .eq('status', 'published')
-      .eq('condition', condition)
-      .neq('id', currentId)
-      .lt('created_at', createdAt)
-      .order('created_at', { ascending: false })
-      .limit(1),
+      const [{ data: prevData }, { data: nextData }] = await Promise.all([
+        supabase
+          .from('vehicles')
+          .select(cols)
+          .eq('status', 'published')
+          .eq('condition', condition)
+          .neq('id', currentId)
+          .lt('created_at', createdAt)
+          .order('created_at', { ascending: false })
+          .limit(1),
 
-    supabase
-      .from('vehicles')
-      .select(cols)
-      .eq('status', 'published')
-      .eq('condition', condition)
-      .neq('id', currentId)
-      .gt('created_at', createdAt)
-      .order('created_at', { ascending: true })
-      .limit(1),
-  ]);
+        supabase
+          .from('vehicles')
+          .select(cols)
+          .eq('status', 'published')
+          .eq('condition', condition)
+          .neq('id', currentId)
+          .gt('created_at', createdAt)
+          .order('created_at', { ascending: true })
+          .limit(1),
+      ]);
 
-  return {
-    prev: prevData?.[0] ?? null,
-    next: nextData?.[0] ?? null,
-  };
+      return {
+        prev: prevData?.[0] ?? null,
+        next: nextData?.[0] ?? null,
+      };
+    },
+    TTL.vehicle,
+  );
 }
 
 // ─── Similar cars ─────────────────────────────────────────────────────────────
@@ -197,80 +252,92 @@ export async function getSimilarVehicles(
   priceKes: number | null,
   condition: 'used' | 'new',
 ) {
-  const supabase = await supabaseServer();
-  const LIMIT = 4;
+  return cached(
+    CK.similar(currentId, bodyType, priceKes),
+    async () => {
+      const supabase = await supabaseServer();
+      const LIMIT = 4;
 
-  const cols = 'id, slug, make, model, year, price_kes, images, condition, body_type, mileage_km, transmission, city';
+      const cols = 'id, slug, make, model, year, price_kes, images, condition, body_type, mileage_km, transmission, city';
 
-  // ── pass 1: same body type ──
-  let byBody: any[] = [];
-  if (bodyType) {
-    const { data } = await supabase
-      .from('vehicles')
-      .select(cols)
-      .eq('status', 'published')
-      .eq('body_type', bodyType)
-      .neq('id', currentId)
-      .limit(LIMIT);
-    byBody = data ?? [];
-  }
+      // ── pass 1: same body type ──
+      let byBody: any[] = [];
+      if (bodyType) {
+        const { data } = await supabase
+          .from('vehicles')
+          .select(cols)
+          .eq('status', 'published')
+          .eq('body_type', bodyType)
+          .neq('id', currentId)
+          .limit(LIMIT);
+        byBody = data ?? [];
+      }
 
-  if (byBody.length >= LIMIT) return byBody.slice(0, LIMIT);
+      if (byBody.length >= LIMIT) return byBody.slice(0, LIMIT);
 
-  // ── pass 2: fill with price-range neighbours ──
-  const existingIds = new Set([currentId, ...byBody.map((c) => c.id)]);
-  let byPrice: any[] = [];
+      // ── pass 2: fill with price-range neighbours ──
+      const existingIds = new Set([currentId, ...byBody.map((c) => c.id)]);
+      let byPrice: any[] = [];
 
-  if (priceKes) {
-    const margin = 0.4;
-    const min = Math.round(priceKes * (1 - margin));
-    const max = Math.round(priceKes * (1 + margin));
+      if (priceKes) {
+        const margin = 0.4;
+        const min = Math.round(priceKes * (1 - margin));
+        const max = Math.round(priceKes * (1 + margin));
 
-    const { data } = await supabase
-      .from('vehicles')
-      .select(cols)
-      .eq('status', 'published')
-      .neq('id', currentId)
-      .gte('price_kes', min)
-      .lte('price_kes', max)
-      .order('price_kes', { ascending: true })
-      .limit(LIMIT * 2);
+        const { data } = await supabase
+          .from('vehicles')
+          .select(cols)
+          .eq('status', 'published')
+          .neq('id', currentId)
+          .gte('price_kes', min)
+          .lte('price_kes', max)
+          .order('price_kes', { ascending: true })
+          .limit(LIMIT * 2);
 
-    byPrice = (data ?? []).filter((c) => !existingIds.has(c.id));
-  }
+        byPrice = (data ?? []).filter((c) => !existingIds.has(c.id));
+      }
 
-  return [...byBody, ...byPrice].slice(0, LIMIT);
+      return [...byBody, ...byPrice].slice(0, LIMIT);
+    },
+    TTL.vehicle,
+  );
 }
 
 // ─── Condition Counts ─────────────────────────────────────────────────────────
 
 export async function getConditionCounts(f: Omit<Filters, 'condition' | 'page'>) {
-  const supabase = await supabaseServer();
+  return cached(
+    CK.conditionCounts(f),
+    async () => {
+      const supabase = await supabaseServer();
 
-  function buildBase() {
-    let q = supabase
-      .from('vehicles')
-      .select('*', { count: 'exact', head: true })
-      .eq('status', 'published');
+      function buildBase() {
+        let q = supabase
+          .from('vehicles')
+          .select('*', { count: 'exact', head: true })
+          .eq('status', 'published');
 
-    // apply every active filter except condition and page
-    if (f.q)            q = q.ilike('search_text', `%${f.q.toLowerCase()}%`);
-    if (f.make)         q = q.ilike('make', f.make);
-    if (f.city)         q = q.ilike('city', f.city);
-    if (f.body)         q = q.eq('body_type', f.body);
-    if (f.fuel)         q = q.eq('fuel', f.fuel);
-    if (f.transmission) q = q.eq('transmission', f.transmission);
-    if (f.min != null)  q = q.gte('price_kes', f.min);
-    if (f.max != null)  q = q.lte('price_kes', f.max);
-    if (f.yearFrom)     q = q.gte('year', f.yearFrom);
+        // apply every active filter except condition and page
+        if (f.q)            q = q.ilike('search_text', `%${f.q.toLowerCase()}%`);
+        if (f.make)         q = q.ilike('make', f.make);
+        if (f.city)         q = q.ilike('city', f.city);
+        if (f.body)         q = q.eq('body_type', f.body);
+        if (f.fuel)         q = q.eq('fuel', f.fuel);
+        if (f.transmission) q = q.eq('transmission', f.transmission);
+        if (f.min != null)  q = q.gte('price_kes', f.min);
+        if (f.max != null)  q = q.lte('price_kes', f.max);
+        if (f.yearFrom)     q = q.gte('year', f.yearFrom);
 
-    return q;
-  }
+        return q;
+      }
 
-  const [{ count: used }, { count: newCount }] = await Promise.all([
-    buildBase().eq('condition', 'used'),
-    buildBase().eq('condition', 'new'),
-  ]);
+      const [{ count: used }, { count: newCount }] = await Promise.all([
+        buildBase().eq('condition', 'used'),
+        buildBase().eq('condition', 'new'),
+      ]);
 
-  return { used: used ?? 0, new: newCount ?? 0 };
+      return { used: used ?? 0, new: newCount ?? 0 };
+    },
+    TTL.counts,
+  );
 }

@@ -77,7 +77,7 @@ export async function saveVehicle(
       .update(payload)
       .eq('id', id);
 
-    if (error) return { ok: false, message: error.message };
+    if (error) return { ok: false, message: friendlyDbError(error.message) };
 
     // determine the most meaningful action label
     let action: ActivityAction = 'updated';
@@ -114,7 +114,7 @@ export async function saveVehicle(
       .select('id')
       .single();
 
-    if (error) return { ok: false, message: error.message };
+    if (error) return { ok: false, message: friendlyDbError(error.message) };
 
     await logActivity({
       adminId:     admin.user_id,
@@ -252,4 +252,28 @@ export async function deleteVehicle(
   revalidatePath(`/cars/${vehicle.slug}`);
   revalidatePath('/admin');
   redirect('/admin');
+}
+
+// ── error translator ──────────────────────────────────────────────────────────
+
+function friendlyDbError(message: string): string {
+  if (message.includes('vehicles_make_trimmed'))
+    return 'The Make field has extra spaces — please remove any spaces before or after the brand name (e.g. "Toyota" not "Toyota ").';
+
+  if (message.includes('vehicles_model_trimmed'))
+    return 'The Model field has extra spaces — please remove any spaces before or after the model name.';
+
+  if (message.includes('unique constraint') || message.includes('vehicles_slug_key'))
+    return 'A listing with this make, model and year already exists. Change a detail or the year to create a unique listing.';
+
+  if (message.includes('violates not-null constraint'))
+    return 'A required field is missing. Please check all required fields are filled in.';
+
+  if (message.includes('violates check constraint'))
+    return 'One or more fields contain invalid characters or formatting. Please check the form and try again.';
+
+  // fallback — show the raw message in dev, generic text in production
+  return process.env.NODE_ENV === 'development'
+    ? `Database error: ${message}`
+    : 'Something went wrong saving this listing. Please try again or contact support.';
 }

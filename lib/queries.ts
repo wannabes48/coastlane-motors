@@ -27,11 +27,11 @@ export async function listVehicles(f: Filters) {
 
     if (f.condition)    q = q.eq('condition', f.condition);
     if (f.q)            q = q.ilike('search_text', `%${f.q.toLowerCase()}%`);
-    if (f.make)         q = q.ilike('make', f.make);
-    if (f.city)         q = q.ilike('city', f.city);
-    if (f.body)         q = q.eq('body_type', f.body);
-    if (f.fuel)         q = q.eq('fuel', f.fuel);
-    if (f.transmission) q = q.eq('transmission', f.transmission);
+    if (f.make)         q = q.ilike('make', f.make.trim());
+    if (f.city)         q = q.ilike('city', f.city.trim());
+    if (f.body)         q = q.eq('body_type', f.body.trim());
+    if (f.fuel)         q = q.eq('fuel', f.fuel.trim());
+    if (f.transmission) q = q.eq('transmission', f.transmission.trim());
     if (f.min != null)  q = q.gte('price_kes', f.min);
     if (f.max != null)  q = q.lte('price_kes', f.max);
     if (f.yearFrom)     q = q.gte('year', f.yearFrom);

@@ -7,6 +7,7 @@ import { ImageUploader } from './image-uploader';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { AlertCircle } from 'lucide-react';
 
 export function CarForm({ initialData = null }: { initialData?: any }) {
   const [saving, setSaving] = useState(false);
@@ -39,16 +40,52 @@ export function CarForm({ initialData = null }: { initialData?: any }) {
     if (!res?.ok) {
       setError(res?.message || 'Failed to save vehicle');
       setSaving(false);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       toast.success('Vehicle saved successfully!');
       router.push('/admin');
     }
   };
 
+  const makeReg = register('make');
+  const modelReg = register('model');
+
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 pb-16">
-        {error && <div className="bg-red-50 text-red-600 p-4 rounded text-sm">{error}</div>}
+        
+        {/* ── error banner ── */}
+        {error && (
+          <div
+            role="alert"
+            aria-live="assertive"
+            className="flex items-start gap-3
+                       bg-red-50 border border-red-200 rounded-xl
+                       px-4 py-4"
+          >
+            <AlertCircle
+              size={18}
+              aria-hidden="true"
+              className="text-red-500 shrink-0 mt-0.5"
+            />
+            <div>
+              <p className="font-sans text-[13px] font-semibold text-red-700 mb-0.5">
+                Could not save this listing
+              </p>
+              <p className="font-sans text-[12px] text-red-600 leading-relaxed">
+                {error}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setError('')}
+              aria-label="Dismiss error"
+              className="ml-auto text-red-400 hover:text-red-600 shrink-0"
+            >
+              ✕
+            </button>
+          </div>
+        )}
         
         <div className="bg-white p-6 rounded-[var(--radius-card)] shadow-[var(--shadow-card)]">
           <h2 className="font-sans font-semibold text-lg mb-4">Photos</h2>
@@ -63,8 +100,30 @@ export function CarForm({ initialData = null }: { initialData?: any }) {
         <div className="bg-white p-6 rounded-[var(--radius-card)] shadow-[var(--shadow-card)] grid grid-cols-1 md:grid-cols-2 gap-6">
           <h2 className="font-sans font-semibold text-lg md:col-span-2 border-b border-line pb-2">Basic Info</h2>
           
-          <div><label className="block text-sm font-semibold mb-1">Make</label><input {...register('make')} className="w-full border border-line rounded-[var(--radius-card)] px-4 h-12 text-base focus:border-azure focus:outline-none" /></div>
-          <div><label className="block text-sm font-semibold mb-1">Model</label><input {...register('model')} className="w-full border border-line rounded-[var(--radius-card)] px-4 h-12 text-base focus:border-azure focus:outline-none" /></div>
+          <div>
+            <label className="block text-sm font-semibold mb-1">Make</label>
+            <input 
+              {...makeReg} 
+              onBlur={(e) => {
+                setValue('make', e.target.value.trim(), { shouldValidate: true });
+                makeReg.onBlur(e);
+              }}
+              placeholder="e.g. Toyota"
+              className="w-full border border-line rounded-[var(--radius-card)] px-4 h-12 text-base focus:border-azure focus:outline-none" 
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold mb-1">Model</label>
+            <input 
+              {...modelReg} 
+              onBlur={(e) => {
+                setValue('model', e.target.value.trim(), { shouldValidate: true });
+                modelReg.onBlur(e);
+              }}
+              placeholder="e.g. Land Cruiser Prado"
+              className="w-full border border-line rounded-[var(--radius-card)] px-4 h-12 text-base focus:border-azure focus:outline-none" 
+            />
+          </div>
           <div><label className="block text-sm font-semibold mb-1">Year</label><input type="number" {...register('year')} className="w-full border border-line rounded-[var(--radius-card)] px-4 h-12 text-base focus:border-azure focus:outline-none" /></div>
           
           <div>

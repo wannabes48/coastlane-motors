@@ -341,3 +341,7 @@ export async function getConditionCounts(f: Omit<Filters, 'condition' | 'page'>)
     TTL.counts,
   );
 }
+
+// ─── Hero Slides ─────────────────────────────────────────────────────────────
+export { getHeroSlides, type HeroSlideData } from '@/lib/queries-hero';
+

@@ -5,7 +5,7 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
 
-import { HeroSearch }    from '@/components/hero-search';
+import { HeroSection }   from '@/components/home/hero-section';
 import { TrustBar }      from '@/components/home/trust-bar';
 import { BrandRow }      from '@/components/brand-row';
 import { CategoryRail }  from '@/components/category-rail';
@@ -47,7 +47,7 @@ export default async function HomePage() {
   return (
     <main>
       {/* ① Hero + search — above the fold */}
-      <HeroSearch />
+      <HeroSection />
 
       {/* ② Trust bar — answers first objections immediately */}
       <TrustBar />

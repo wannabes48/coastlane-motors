@@ -1,5 +1,36 @@
 /* app/globals.css — Tailwind v4 */
 @import "tailwindcss";
+@import "tw-animate-css";
+
+@theme inline {
+  --color-background-subtle: var(--background-subtle);
+  --color-background-muted: var(--background-muted);
+  --color-border-muted: var(--border-muted);
+  --color-border-strong: var(--border-strong);
+  --color-border-inverse: var(--border-inverse);
+  --color-foreground-intense: var(--foreground-intense);
+  --color-ring-light: var(--focus-ring-light);
+}
+
+:root {
+  --background-subtle: oklch(0.985 0.002 247.839);
+  --background-muted: oklch(0.967 0.003 264.542);
+  --border-muted: oklch(0.967 0.003 264.542);
+  --border-strong: oklch(0.872 0.01 258.338);
+  --border-inverse: oklch(0.278 0.033 256.848);
+  --foreground-intense: oklch(0.21 0.034 264.665);
+  --focus-ring-light: oklch(1 0 0 / 25%);
+}
+
+.dark {
+  --background-subtle: oklch(0.551 0.027 264.364 / 8%);
+  --background-muted: oklch(0.21 0.034 264.665);
+  --border-muted: oklch(0.21 0.034 264.665);
+  --border-strong: oklch(0.373 0.034 259.733);
+  --border-inverse: oklch(0.928 0.006 264.531);
+  --foreground-intense: oklch(1 0 0);
+  --focus-ring-light: oklch(1 0 0 / 25%);
+}
 
 @theme {
   /* ── Colour ── */
@@ -54,9 +85,19 @@
     background-color: var(--color-white);
   }
 
-  a, button, [role="button"], select, input[type="checkbox"], input[type="radio"] {
+  a:not([data-no-min]),
+  button:not([data-no-min]),
+  [role="button"]:not([data-no-min]),
+  select,
+  input[type="checkbox"],
+  input[type="radio"] {
     min-height: 44px;
     min-width: 44px;
+  }
+
+  [data-no-min] {
+    min-height: 0 !important;
+    min-width: 0 !important;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -87,3 +128,28 @@
   .scrollbar-none::-webkit-scrollbar { display: none; }
   .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
 }
+
+@layer components {
+  .prose-custom p {
+    @apply text-ink/80 text-[15px] md:text-base leading-relaxed mb-6;
+  }
+  .prose-custom h2 {
+    @apply text-xl md:text-2xl font-bold text-ink mt-10 mb-4 tracking-tight;
+  }
+  .prose-custom h3 {
+    @apply text-lg font-semibold text-ink mt-8 mb-3;
+  }
+  .prose-custom ul {
+    @apply list-disc list-outside ml-5 mb-6 text-ink/80 text-[15px] md:text-base space-y-2;
+  }
+  .prose-custom li::marker {
+    @apply text-azure;
+  }
+  .prose-custom strong {
+    @apply font-semibold text-ink;
+  }
+  .prose-custom a {
+    @apply text-azure hover:underline underline-offset-4;
+  }
+}
+

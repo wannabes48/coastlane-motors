@@ -135,11 +135,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <Link href="/new" className="hover:text-white w-fit">New Cars</Link>
                 <Link href="/about" className="hover:text-white w-fit">About Us</Link>
                 <Link href="/contact" className="hover:text-white w-fit">Contact</Link>
+                <Link href="/privacy-policy" className="hover:text-white w-fit">Privacy Policy</Link>
+                <Link href="/terms" className="hover:text-white w-fit">Terms of Service</Link>
               </nav>
             </div>
           </div>
-          <div className="max-w-7xl mx-auto px-4 mt-12 pt-8 border-t border-white/10 text-center text-white/60 text-sm">
+          <div className="max-w-7xl mx-auto px-4 mt-12 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left text-white/60 text-sm">
             <p>&copy; {new Date().getFullYear()} Coastlane Motors. All rights reserved.</p>
+            <div className="flex items-center gap-6">
+              <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
+              <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
+            </div>
           </div>
         </footer>
         <WhatsAppFAB />

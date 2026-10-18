@@ -1,39 +1,83 @@
+// app/(public)/terms/page.tsx
+import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Terms of Service',
-  description: 'Terms of Service for Coastlane Motors. Disclaimers regarding vehicle pricing, reservations, and policies.',
+  description: 'Terms and conditions for using Coastlane Motors services and website.',
 };
 
 export default function TermsOfService() {
+  const lastUpdated = "October 18, 2026";
+
   return (
-    <div className="bg-white min-h-[calc(100vh-72px)] py-12 lg:py-16">
-      <div className="max-w-3xl mx-auto px-4 prose prose-slate">
-        <h1 className="font-sans font-bold text-step-2 text-ink mb-8">Terms of Service</h1>
+    <main className="min-h-screen bg-sky py-12 md:py-24">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <p>Last updated: {new Date().toLocaleDateString()}</p>
-        
-        <h2>1. Vehicle Pricing and Availability</h2>
-        <p>All prices listed on the Coastlane Motors website are in Kenyan Shillings (KES) unless otherwise stated. While we strive for accuracy, prices and vehicle availability are subject to change without notice. All vehicles are sold subject to prior sale.</p>
+        {/* Navigation & Header */}
+        <div className="mb-10 md:mb-14">
+          <Link 
+            href="/" 
+            className="inline-flex items-center gap-2 text-slate hover:text-azure transition-colors text-[13px] font-semibold mb-8"
+          >
+            <ArrowLeft size={16} />
+            Back to Home
+          </Link>
+          
+          <h1 className="text-4xl md:text-5xl font-extrabold text-ink tracking-tight mb-4">
+            Terms of Service
+          </h1>
+          <p className="text-slate font-medium">
+            Last updated: {lastUpdated}
+          </p>
+        </div>
 
-        <h2>2. Duties and Taxes</h2>
-        <p>Unless explicitly marked as "Duty Paid," vehicle prices may not include import duties, registration fees, or other governmental taxes. Please confirm the final on-the-road price with our sales team.</p>
+        {/* Content Body */}
+        <div className="bg-white rounded-[var(--radius-card)] shadow-sm border border-line p-6 md:p-12">
+          <div className="prose-custom">
+            
+            <p>
+              Welcome to Coastlane Motors. These Terms of Service govern your use of our website and services, including vehicle browsing, reservation deposits, and import requests.
+            </p>
 
-        <h2>3. Reservation Deposits</h2>
-        <p>A vehicle can be reserved with a non-refundable deposit. The deposit amount and the duration for which the vehicle will be held will be agreed upon in writing between the buyer and Coastlane Motors.</p>
+            <h2>1. Acceptance of Terms</h2>
+            <p>
+              By accessing or using the Coastlane Motors website (the "Service"), you agree to be bound by these Terms. If you disagree with any part of the terms, you may not access the Service.
+            </p>
 
-        <h2>4. Condition of Used Vehicles</h2>
-        <p>All used vehicles are sold "as-is," without any express or implied warranties, unless a specific warranty is provided in writing at the time of sale. We encourage all buyers to inspect the vehicle or hire an independent mechanic prior to purchase.</p>
+            <h2>2. Vehicle Pricing and Availability</h2>
+            <p>
+              All prices are listed in Kenyan Shillings (KES) and include standard import duties where applicable. However, prices and availability are subject to change without notice. 
+            </p>
+            <ul>
+              <li>Vehicles marked as "In Transit" are subject to estimated arrival dates.</li>
+              <li>A reserved vehicle is only guaranteed once the KES 10,000 holding deposit is fully cleared via M-Pesa.</li>
+              <li>Deposits for locally stocked vehicles are fully refundable if the vehicle fails physical inspection by the buyer.</li>
+            </ul>
 
-        <h2>5. Return Policy</h2>
-        <p>Due to the nature of motor vehicle sales and Kenyan registration laws, all sales are final. Coastlane Motors does not offer returns or exchanges once the vehicle logbook transfer has been initiated or the vehicle has left our premises.</p>
+            <h2>3. Import on Order</h2>
+            <p>
+              For vehicles sourced directly from Japanese auctions, a separate binding import agreement will be signed. The initial website inquiry does not constitute a finalized purchase contract.
+            </p>
 
-        <h2>6. Limitation of Liability</h2>
-        <p>Coastlane Motors shall not be liable for any indirect, incidental, or consequential damages resulting from the use or inability to use our website or from the purchase of any vehicle.</p>
-        
-        <h2>7. Contact Information</h2>
-        <p>For any questions regarding these Terms, please contact our sales office directly.</p>
+            <h2>4. Limitation of Liability</h2>
+            <p>
+              Coastlane Motors shall not be held liable for indirect, incidental, or consequential damages resulting from the use of our digital platforms or reliance on estimated vehicle arrival times.
+            </p>
+
+            <h2>5. Contact Us</h2>
+            <p>
+              If you have any questions about these Terms, please contact us at:
+              <br />
+              <strong>Email:</strong> sales@coastlanemotors.co.ke
+              <br />
+              <strong>Phone:</strong> +254 702 751 085
+            </p>
+          </div>
+        </div>
+
       </div>
-    </div>
+    </main>
   );
 }

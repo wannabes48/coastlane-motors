@@ -129,6 +129,7 @@ export async function saveVehicle(
   await Promise.all([
     bustPattern('listings:*'),
     bustPattern('condition-counts:*'),
+    bustPattern('hero-slides:*'),
     bust(
       CK.categoryCounts(),
       CK.budgetCounts(),
@@ -188,7 +189,10 @@ export async function setFeatured(
     });
   }
 
-  await bust(CK.featured());
+  await Promise.all([
+    bust(CK.featured()),
+    bustPattern('hero-slides:*'),
+  ]);
 
   revalidatePath('/');
   revalidatePath('/admin');
@@ -237,6 +241,7 @@ export async function deleteVehicle(
   await Promise.all([
     bustPattern('listings:*'),
     bustPattern('condition-counts:*'),
+    bustPattern('hero-slides:*'),
     bust(
       CK.vehicle(vehicle.slug),
       CK.categoryCounts(),

@@ -16,7 +16,7 @@ import {
   TrendingUp,
   Car
 } from "lucide-react";
-import { motion, useScroll, useTransform, useInView, useSpring } from "framer-motion";
+import { motion, useScroll, useTransform, useInView, useSpring, type Variants } from "framer-motion";
 import Link from "next/link";
 
 export default function AboutUsSection() {
@@ -41,7 +41,7 @@ export default function AboutUsSection() {
     setIsVisible(true);
   }, []);
 
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -52,7 +52,7 @@ export default function AboutUsSection() {
     },
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { y: 20, opacity: 0 },
     visible: {
       y: 0,
@@ -347,10 +347,7 @@ interface ServiceItemProps {
   secondaryIcon?: React.ReactNode;
   title: string;
   description: string;
-  variants: {
-    hidden: { opacity: number; y?: number };
-    visible: { opacity: number; y?: number; transition: { duration: number; ease: string } };
-  };
+  variants: Variants;
   delay: number;
   direction: "left" | "right";
 }

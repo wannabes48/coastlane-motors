@@ -17,8 +17,12 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: '48x48' },
-      { url: '/icon-v2.svg', type: 'image/svg+xml' },
-    ]
+      { url: '/icon-v3.png', type: 'image/png', sizes: '48x48' },
+      { url: '/icon-v3.svg', type: 'image/svg+xml' },
+    ],
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
   }
 };
 
@@ -39,7 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         name: 'Coastlane Motors',
         url: process.env.NEXT_PUBLIC_SITE_URL,
         telephone: process.env.NEXT_PUBLIC_PHONE,
-        image: `${process.env.NEXT_PUBLIC_SITE_URL}/icon.svg`,
+        image: `${process.env.NEXT_PUBLIC_SITE_URL}/logo.png`,
         address: {
           '@type': 'PostalAddress',
           streetAddress: 'Haile Sellassie Avenue',

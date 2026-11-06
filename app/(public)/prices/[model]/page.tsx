@@ -45,7 +45,7 @@ export default async function PricingPage({ params }: { params: Promise<{ model:
             <p className="text-sm mt-4 italic">Note: Prices vary based on condition and duty payment status.</p>
           </div>
           <p>
-            When buying a {formattedMake} {formattedModel} in Kenya, ensure the logbook is ready and the mileage is verified. At Coastlane Motors, all our vehicles are duty paid and carefully inspected.
+            When buying a {formattedMake} {formattedModel} in Kenya, ensure the logbook is ready and the mileage is verified. At Vorback Motors, all our vehicles are duty paid and carefully inspected.
           </p>
           <div className="mt-8 pt-8 border-t border-line text-center">
             <Link href={`/used/${make.toLowerCase()}`} className="bg-azure text-white px-6 py-3 rounded-full font-semibold hover:bg-azure-ink transition-colors inline-block">

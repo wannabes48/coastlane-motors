@@ -8,8 +8,8 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   const q = params.q;
   return {
     title: q
-      ? `Search results for "${q}" — Coastlane Motors`
-      : 'All cars — Coastlane Motors',
+      ? `Search results for "${q}" — Vorback Motors`
+      : 'All cars — Vorback Motors',
     robots: { index: false, follow: true },
   };
 }

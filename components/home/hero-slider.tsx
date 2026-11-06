@@ -22,10 +22,10 @@ const GRADIENTS = [
 ];
 
 const FALLBACK: HeroSlideData[] = [
-  { slug:'', make:'Coastlane', model:'', year: new Date().getFullYear(),
+  { slug:'', make:'Vorback', model:'', year: new Date().getFullYear(),
     price_kes:null, condition:'used', body_type:'SUV', city:'Mombasa',
     public_id:'', alt:'', cta_href:'/used' },
-  { slug:'', make:'Coastlane', model:'', year: new Date().getFullYear(),
+  { slug:'', make:'Vorback', model:'', year: new Date().getFullYear(),
     price_kes:null, condition:'new', body_type:null, city:'Mombasa',
     public_id:'', alt:'', cta_href:'/new' },
 ];
@@ -220,7 +220,7 @@ export function HeroSlider({ slides }: { slides: HeroSlideData[] }) {
                                 tracking-[2px] sm:tracking-[3px] uppercase text-[#5B8EBF] mb-2 sm:mb-3
                                 flex items-center gap-1.5 sm:gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E]" aria-hidden="true" />
-                    {s.condition === 'new' ? 'New arrival' : 'In stock'} · Coastlane Motors
+                    {s.condition === 'new' ? 'New arrival' : 'In stock'} · Vorback Motors
                   </p>
 
                   <h2

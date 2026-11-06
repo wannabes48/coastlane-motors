@@ -5,7 +5,7 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Terms of Service',
-  description: 'Terms and conditions for using Coastlane Motors services and website.',
+  description: 'Terms and conditions for using Vorback Motors services and website.',
 };
 
 export default function TermsOfService() {
@@ -38,12 +38,12 @@ export default function TermsOfService() {
           <div className="prose-custom">
             
             <p>
-              Welcome to Coastlane Motors. These Terms of Service govern your use of our website and services, including vehicle browsing, reservation deposits, and import requests.
+              Welcome to Vorback Motors. These Terms of Service govern your use of our website and services, including vehicle browsing, reservation deposits, and import requests.
             </p>
 
             <h2>1. Acceptance of Terms</h2>
             <p>
-              By accessing or using the Coastlane Motors website (the "Service"), you agree to be bound by these Terms. If you disagree with any part of the terms, you may not access the Service.
+              By accessing or using the Vorback Motors website (the "Service"), you agree to be bound by these Terms. If you disagree with any part of the terms, you may not access the Service.
             </p>
 
             <h2>2. Vehicle Pricing and Availability</h2>
@@ -63,14 +63,14 @@ export default function TermsOfService() {
 
             <h2>4. Limitation of Liability</h2>
             <p>
-              Coastlane Motors shall not be held liable for indirect, incidental, or consequential damages resulting from the use of our digital platforms or reliance on estimated vehicle arrival times.
+              Vorback Motors shall not be held liable for indirect, incidental, or consequential damages resulting from the use of our digital platforms or reliance on estimated vehicle arrival times.
             </p>
 
             <h2>5. Contact Us</h2>
             <p>
               If you have any questions about these Terms, please contact us at:
               <br />
-              <strong>Email:</strong> sales@coastlanemotors.co.ke
+              <strong>Email:</strong> sales@vorbackmotors.co.ke
               <br />
               <strong>Phone:</strong> +254 702 751 085
             </p>

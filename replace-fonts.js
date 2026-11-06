@@ -19,7 +19,7 @@ function walk(dir) {
   return results;
 }
 
-const files = walk('d:/Coastlane Motors/coastlane');
+const files = walk(__dirname);
 for (const file of files) {
   let content = fs.readFileSync(file, 'utf8');
   let original = content;

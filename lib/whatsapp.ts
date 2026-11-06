@@ -26,7 +26,7 @@ export function waLink(car?: CarForWA | null): string {
 
   if (!car) {
     return `${base}?text=${encodeURIComponent(
-      "Hi Coastlane Motors, I'd like help finding a car.",
+      "Hi Vorback Motors, I'd like help finding a car.",
     )}`;
   }
 

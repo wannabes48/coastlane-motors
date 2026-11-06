@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     car.mileage_km != null ? `${car.mileage_km.toLocaleString()} km,` : '',
     car.transmission ? `${car.transmission},` : '',
     car.fuel ? `${car.fuel}.` : '',
-    'Duty paid, clearly priced in KES. WhatsApp Coastlane Motors to arrange a viewing.',
+    'Duty paid, clearly priced in KES. WhatsApp Vorback Motors to arrange a viewing.',
   ].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
 
   let ogImages: any[] = [];
@@ -100,7 +100,7 @@ export default async function CarDetail({ params }: { params: Promise<{ slug: st
           price: car.price_kes, priceCurrency: 'KES',
           availability: car.status === 'sold' ? 'https://schema.org/SoldOut' : 'https://schema.org/InStock',
           itemCondition: car.condition === 'new' ? 'https://schema.org/NewCondition' : 'https://schema.org/UsedCondition',
-          seller: { '@type': 'AutoDealer', name: 'Coastlane Motors', telephone: phone },
+          seller: { '@type': 'AutoDealer', name: 'Vorback Motors', telephone: phone },
           url: `${process.env.NEXT_PUBLIC_SITE_URL}/cars/${car.slug}`,
         } : undefined,
       },

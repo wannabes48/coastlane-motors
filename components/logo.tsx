@@ -14,12 +14,12 @@ export function Logo({ variant = 'dark', className, priority = true }: LogoProps
       className={`inline-flex items-center gap-2 select-none group transition-opacity hover:opacity-90 active:scale-[0.98] ${
         variant === 'light' ? 'bg-[#0F1923] p-1.5 rounded-lg shadow-sm' : ''
       } ${className ?? ''}`}
-      aria-label="Coastlane Motors home"
+      aria-label="Vorback Motors home"
     >
       <div className="relative h-10 md:h-11 w-auto aspect-[458/206] flex items-center">
         <Image
           src="/logo-brand.png"
-          alt="Coastlane Motors"
+          alt="Vorback Motors"
           width={458}
           height={206}
           priority={priority}

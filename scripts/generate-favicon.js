@@ -2,7 +2,7 @@ const sharp = require('sharp');
 const fs = require('fs');
 const path = require('path');
 
-const CLIENT_TRANSPARENT_IMAGE = 'C:/Users/Dorah Siro/.gemini/antigravity/brain/9579812f-f0b0-4227-b5b8-1eb2687a7994/.user_uploaded/media_1793778872012_c8da8b8c.png';
+const CLIENT_TRANSPARENT_IMAGE = 'C:/Users/Dorah Siro/.gemini/antigravity/brain/bba84a78-327f-4e8a-91a5-67fd697873b6/.user_uploaded/media_1793977332780_17c8b842.png';
 
 function createICO(images) {
   const header = Buffer.alloc(6);
@@ -60,18 +60,18 @@ async function main() {
   fs.copyFileSync(CLIENT_TRANSPARENT_IMAGE, path.join(publicDir, 'logo.png'));
   console.log('✓ Copied transparent master logo to public/logo.png');
 
-  // 2. Generate transparent horizontal brand logo (Car emblem + COASTLANEMOTORS):
-  // Exact bounds: left 22, top 121, width 458, height 206
+  // 2. Generate transparent horizontal brand logo (Car emblem + VORBACK MOTORS):
+  // Exact bounds: left 23, top 121, width 458, height 206
   await sharp(CLIENT_TRANSPARENT_IMAGE)
-    .extract({ left: 22, top: 121, width: 458, height: 206 })
+    .extract({ left: 23, top: 121, width: 458, height: 206 })
     .png()
     .toFile(path.join(publicDir, 'logo-brand.png'));
   console.log('✓ Generated transparent public/logo-brand.png');
 
   // 3. Create square emblem (Car + Speedometer Arc centered on 512x512 #0F1923 canvas):
-  // Car bounds: left 28, top 121, width 445, height 156
+  // Car bounds: left 24, top 121, width 456, height 153
   const emblem = await sharp(CLIENT_TRANSPARENT_IMAGE)
-    .extract({ left: 28, top: 121, width: 445, height: 156 })
+    .extract({ left: 24, top: 121, width: 456, height: 153 })
     .resize(460, null, { fit: 'contain' })
     .ensureAlpha()
     .png()
@@ -82,7 +82,7 @@ async function main() {
       width: 512,
       height: 512,
       channels: 4,
-      background: { r: 15, g: 25, b: 35, alpha: 1 } // #0F1923 Coastlane ink
+      background: { r: 15, g: 25, b: 35, alpha: 1 } // #0F1923 Vorback ink
     }
   })
     .composite([{ input: emblem, gravity: 'center' }])

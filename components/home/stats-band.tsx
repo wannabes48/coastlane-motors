@@ -11,7 +11,7 @@ export async function StatsBand() {
   ];
 
   return (
-    <section className="bg-sky py-10 px-4" aria-label="Coastlane Motors at a glance">
+    <section className="bg-sky py-10 px-4" aria-label="Vorback Motors at a glance">
       <div className="max-w-4xl mx-auto">
         <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-line
                         border border-line-md rounded-[var(--radius-lg)] overflow-hidden">

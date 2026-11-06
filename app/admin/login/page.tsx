@@ -28,7 +28,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-sky px-4">
       <form onSubmit={handleLogin} className="bg-white p-8 rounded-[var(--radius-card)] shadow-[var(--shadow-bar)] max-w-sm w-full">
-        <h1 className="font-sans font-bold text-2xl text-ink mb-6 text-center">Coastlane Admin</h1>
+        <h1 className="font-sans font-bold text-2xl text-ink mb-6 text-center">Vorback Admin</h1>
         {error && <div className="bg-red-50 text-red-600 p-3 rounded mb-4 text-sm">{error}</div>}
         <div className="mb-4">
           <label className="block text-sm font-semibold text-slate mb-1">Email</label>

@@ -5,7 +5,7 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
-  description: 'How Coastlane Motors collects, uses, and protects your personal data.',
+  description: 'How Vorback Motors collects, uses, and protects your personal data.',
 };
 
 export default function PrivacyPolicy() {
@@ -38,7 +38,7 @@ export default function PrivacyPolicy() {
           <div className="prose-custom">
             
             <p>
-              At Coastlane Motors, we take your privacy seriously. This Privacy Policy explains how we collect, use, and protect your personal information when you visit our website, reserve a vehicle, or communicate with our sales team. We comply with the Data Protection Act of Kenya.
+              At Vorback Motors, we take your privacy seriously. This Privacy Policy explains how we collect, use, and protect your personal information when you visit our website, reserve a vehicle, or communicate with our sales team. We comply with the Data Protection Act of Kenya.
             </p>
 
             <h2>1. Information We Collect</h2>
@@ -87,7 +87,7 @@ export default function PrivacyPolicy() {
             <p>
               If you have any questions or concerns regarding this Privacy Policy or how we handle your data, please contact our administrative team:
               <br /><br />
-              <strong>Email:</strong> sales@coastlanemotors.co.ke
+              <strong>Email:</strong> sales@vorbackmotors.co.ke
               <br />
               <strong>Phone:</strong> +254 702 751 085
             </p>

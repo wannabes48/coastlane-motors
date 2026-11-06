@@ -160,7 +160,7 @@ export default function AboutUsSection() {
             <div className="w-4 h-4" />
             Premium Cars. Trusted Dealership
           </motion.span>
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 text-center">About Coastlane Motors</h2>
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 text-center">About Vorback Motors</h2>
           <motion.div
             className="w-24 h-1 bg-azure rounded-full"
             initial={{ width: 0 }}
@@ -170,7 +170,7 @@ export default function AboutUsSection() {
         </motion.div>
 
         <motion.p className="text-center max-w-2xl mx-auto mb-16 text-slate leading-relaxed" variants={itemVariants}>
-          Coastlane Motors is a premium car dealership located in Mombasa, serving the entirety of Kenya and East Africa. 
+          Vorback Motors is a premium car dealership located in Mombasa, serving the entirety of Kenya and East Africa. 
           We pride ourselves on transparency, quality, and straightforward pricing.
         </motion.p>
 

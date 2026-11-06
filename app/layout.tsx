@@ -9,9 +9,9 @@ import { WhatsAppFAB }   from '@/components/whatsapp-fab';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
-  title: { default: 'Coastlane Motors — Used & New Cars for Sale in Kenya', template: '%s | Coastlane Motors' },
+  title: { default: 'Vorback Motors — Used & New Cars for Sale in Kenya', template: '%s | Vorback Motors' },
   description: 'Browse verified used and new cars for sale in Kenya. Clear prices, full photos, duty paid. WhatsApp us to view or reserve.',
-  openGraph: { type: 'website', locale: 'en_KE', siteName: 'Coastlane Motors' },
+  openGraph: { type: 'website', locale: 'en_KE', siteName: 'Vorback Motors' },
   robots: { index: true, follow: true },
   alternates: { canonical: '/' },
   icons: {
@@ -40,7 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       {
         '@type': 'AutoDealer',
         '@id': `${process.env.NEXT_PUBLIC_SITE_URL}/#dealer`,
-        name: 'Coastlane Motors',
+        name: 'Vorback Motors',
         url: process.env.NEXT_PUBLIC_SITE_URL,
         telephone: process.env.NEXT_PUBLIC_PHONE,
         image: `${process.env.NEXT_PUBLIC_SITE_URL}/logo.png`,
@@ -64,14 +64,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }
         ],
         sameAs: [
-          'https://facebook.com/coastlanemotors',
-          'https://instagram.com/coastlanemotors'
+          'https://facebook.com/vorbackmotors',
+          'https://instagram.com/vorbackmotors'
         ]
       },
       {
         '@type': 'LocalBusiness',
         '@id': `${process.env.NEXT_PUBLIC_SITE_URL}/#business`,
-        name: 'Coastlane Motors',
+        name: 'Vorback Motors',
         url: process.env.NEXT_PUBLIC_SITE_URL,
         telephone: process.env.NEXT_PUBLIC_PHONE,
         address: {
@@ -145,7 +145,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
           </div>
           <div className="max-w-7xl mx-auto px-4 mt-12 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left text-white/60 text-sm">
-            <p>&copy; {new Date().getFullYear()} Coastlane Motors. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} Vorback Motors. All rights reserved.</p>
             <div className="flex items-center gap-6">
               <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
               <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>

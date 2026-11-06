@@ -13,10 +13,10 @@ type Props = {
 };
 
 export function ShareButton({ car }: Props) {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://coastlanemotors.co.ke';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://vorbackmotors.co.ke';
   const shareUrl = `${siteUrl}/cars/${car.slug}`;
   const price = car.price_kes ? `KSh ${car.price_kes.toLocaleString()}` : '';
-  const shareText = `Check out this ${car.year} ${car.make} ${car.model}${price ? ` at ${price}` : ''} — Coastlane Motors\n${shareUrl}`;
+  const shareText = `Check out this ${car.year} ${car.make} ${car.model}${price ? ` at ${price}` : ''} — Vorback Motors\n${shareUrl}`;
 
   return (
     <a

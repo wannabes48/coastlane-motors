@@ -46,7 +46,7 @@ export function WhyUs() {
       <div className="max-w-5xl mx-auto">
         {/* header */}
         <p className="font-[Poppins] text-[11px] font-semibold tracking-[3px] uppercase text-[#1479E0] mb-2">
-          Why Coastlane Motors
+          Why Vorback Motors
         </p>
         <h2
           id="why-us-heading"

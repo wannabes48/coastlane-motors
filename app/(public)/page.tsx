@@ -24,7 +24,7 @@ import { getCategoryCountsByCondition } from '@/lib/queries';
 export const revalidate = 300; // revalidate every 5 minutes
 
 export const metadata: Metadata = {
-  title: 'Coastlane Motors — Used & New Cars for Sale in Kenya',
+  title: 'Vorback Motors — Used & New Cars for Sale in Kenya',
   description:
     'Browse verified used and new cars for sale in Kenya. Duty paid, clearly priced in KES, real yard photos. Toyota, Mazda, Subaru and more. WhatsApp us to view today.',
   alternates: { canonical: '/' },

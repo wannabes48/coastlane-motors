@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 export const metadata: Metadata = {
   title: 'Contact Us',
-  description: 'Get in touch with Coastlane Motors. WhatsApp us or visit our showroom in Mombasa.',
+  description: 'Get in touch with Vorback Motors. WhatsApp us or visit our showroom in Mombasa.',
 };
 
 export default function ContactPage() {
@@ -20,7 +20,7 @@ export default function ContactPage() {
         <div className="w-full">
           <div className="space-y-6">
             <h1 className="text-xl font-medium text-azure">
-              Connect with a Coastlane Expert
+              Connect with a Vorback Expert
             </h1>
             <h2 className="w-full text-5xl font-bold tracking-tight text-ink md:text-7xl">
               Let’s find your <br className="hidden md:block" /> perfect vehicle
@@ -134,7 +134,7 @@ export default function ContactPage() {
               <div className="flex space-x-3 items-start">
                 <Checkbox id="consent" className="mt-1" />
                 <Label htmlFor="consent" className="text-slate text-xs font-normal leading-relaxed">
-                  By checking this box, you agree to allow Coastlane Motors to contact you regarding your vehicle inquiry. Your data is kept strictly confidential.
+                  By checking this box, you agree to allow Vorback Motors to contact you regarding your vehicle inquiry. Your data is kept strictly confidential.
                 </Label>
               </div>
               
@@ -148,7 +148,7 @@ export default function ContactPage() {
               <div className="flex-1 flex flex-col justify-center">
                 <Quote className="h-12 w-12 text-azure mb-8 opacity-20" />
                 <p className="text-xl md:text-2xl font-serif text-ink italic leading-relaxed">
-                  “Buying my Prado from Coastlane Motors was the smoothest process. The team was completely transparent about the car's history, professional throughout, and handled all the complicated transfer paperwork for me. Highly recommend them to anyone in Mombasa!”
+                  “Buying my Prado from Vorback Motors was the smoothest process. The team was completely transparent about the car's history, professional throughout, and handled all the complicated transfer paperwork for me. Highly recommend them to anyone in Mombasa!”
                 </p>
                 <div className="mt-8 flex items-center gap-4">
                   <div className="h-12 w-12 rounded-full bg-slate flex items-center justify-center text-white font-bold text-lg">

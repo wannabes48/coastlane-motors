@@ -23,7 +23,7 @@ export async function POST(req: Request) {
   if (process.env.RESEND_API_KEY) {
     const resend = new Resend(process.env.RESEND_API_KEY);
     await resend.emails.send({
-      from: 'Coastlane Motors <website@coastlanemotors.co.ke>',
+      from: 'Vorback Motors <website@vorbackmotors.co.ke>',
       to: process.env.SALES_INBOX!,
       replyTo: data.email,
       subject: `New enquiry — ${data.name}`,

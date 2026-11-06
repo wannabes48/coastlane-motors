@@ -15,7 +15,7 @@ export function WhatsAppFAB() {
   }, []);
 
   const number  = process.env.NEXT_PUBLIC_WHATSAPP ?? '';
-  const message = encodeURIComponent("Hi Coastlane Motors, I'd like help finding a car.");
+  const message = encodeURIComponent("Hi Vorback Motors, I'd like help finding a car.");
   const href    = `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP}?text=${message}`;
 
   return (

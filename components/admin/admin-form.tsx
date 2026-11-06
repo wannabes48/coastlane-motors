@@ -53,7 +53,7 @@ export function AdminForm() {
                             text-[#64748B] uppercase tracking-wide mb-1">
             Email
           </label>
-          <input name="email" type="email" required placeholder="ali@coastlanemotors.co.ke"
+          <input name="email" type="email" required placeholder="ali@vorbackmotors.co.ke"
                  className="w-full h-11 px-3 font-[Poppins] text-[13px]
                             border border-[#E2E8F0] rounded-lg bg-white
                             focus:outline-none focus:border-[#1565C0]

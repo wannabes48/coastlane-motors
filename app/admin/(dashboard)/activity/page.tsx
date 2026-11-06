@@ -4,7 +4,7 @@
 import { ActivityLog } from '@/components/admin/activity-log';
 import type { Metadata } from 'next';
 
-export const metadata: Metadata = { title: 'Activity log — Coastlane Admin' };
+export const metadata: Metadata = { title: 'Activity log — Vorback Admin' };
 export const dynamic = 'force-dynamic';
 
 export default function ActivityPage() {

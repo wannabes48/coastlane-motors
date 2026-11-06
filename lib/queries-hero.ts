@@ -54,7 +54,7 @@ export async function getHeroSlides(limit = 4): Promise<HeroSlideData[]> {
         body_type: v.body_type,
         city:      v.city,
         public_id: v.images[0].public_id,
-        alt:       v.images[0].alt || `${v.year} ${v.make} ${v.model} at Coastlane Motors`,
+        alt:       v.images[0].alt || `${v.year} ${v.make} ${v.model} at Vorback Motors`,
         cta_href:  `/cars/${v.slug}`,
       }));
     },

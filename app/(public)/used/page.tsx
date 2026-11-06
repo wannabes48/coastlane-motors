@@ -8,8 +8,8 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
   const base = `${process.env.NEXT_PUBLIC_SITE_URL}/used`;
 
   return {
-    title: 'Used Cars for Sale in Kenya (2026) — Coastlane Motors',
-    description: 'Browse used cars for sale in Kenya with clear KES prices, real photos and duty paid stock. Toyota, Mazda, Subaru and more. WhatsApp Coastlane Motors to view.',
+    title: 'Used Cars for Sale in Kenya (2026) — Vorback Motors',
+    description: 'Browse used cars for sale in Kenya with clear KES prices, real photos and duty paid stock. Toyota, Mazda, Subaru and more. WhatsApp Vorback Motors to view.',
     alternates: {
       canonical: page === 1 ? base : `${base}?page=${page}`,
     },
